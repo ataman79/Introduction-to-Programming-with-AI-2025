@@ -1,0 +1,46 @@
+/* Minev — plain HTML/CSS responsive styles */
+:root{
+  --brand: #0b66d0;
+  --muted: #6b7280;
+  --bg: #ffffff;
+  --accent: #06b6a4;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;color:#111827;background:var(--bg);line-height:1.5}
+.container{max-width:1100px;margin:0 auto;padding:0 16px}
+.site-header{background:#fff;border-bottom:1px solid #eef2f7}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.brand{display:flex;align-items:center;text-decoration:none;color:inherit}
+.brand-logo{width:44px;height:44px;border-radius:8px;object-fit:cover;margin-right:10px}
+.brand-name{font-weight:600}
+.nav-menu{display:flex;gap:18px;align-items:center}
+.nav-link{color:var(--muted);text-decoration:none;padding:8px 6px;border-radius:6px}
+.nav-link:hover{color:var(--brand);background:rgba(11,102,208,0.06)}
+.nav-link.active{color:var(--brand);font-weight:600}
+.nav-toggle{display:none;background:transparent;border:0;font-size:22px}
+.hero{background: linear-gradient(120deg, rgba(11,102,208,0.95), rgba(6,182,164,0.9));color:#fff;padding:48px 0}
+.hero-inner{display:flex;align-items:center;gap:24px}
+.hero-text h1{font-size:32px;margin:0 0 8px}
+.hero-text .lead{opacity:0.95;margin-bottom:16px}
+.btn{display:inline-block;padding:10px 18px;border-radius:8px;text-decoration:none}
+.btn-primary{background:#fff;color:var(--brand);font-weight:600}
+.btn-secondary{background:transparent;border:1px solid rgba(255,255,255,0.35);color:#fff;padding:8px 14px}
+.hero-image img{width:320px;border-radius:10px;display:block}
+.services{padding:40px 0}
+.services h2{margin-top:0}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:#fff;border-radius:10px;padding:18px;box-shadow:0 6px 18px rgba(13,38,59,0.06)}
+.card h3{margin-top:0}
+.testimonials{background:#f8fafc;padding:40px 0}
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.testimonial{background:#fff;padding:16px;border-radius:8px}
+.testimonial .cite{margin-top:12px;color:var(--muted);font-size:0.95rem}
+.site-footer{background:#0b1720;color:#fff;padding:20px 0}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.site-footer a{color:inherit;text-decoration:none}
+input,textarea{width:100%;padding:10px;border:1px solid #e6edf3;border-radius:8px}
+label{display:block;margin-bottom:6px;font-weight:600}
+.mb-3{margin-bottom:16px}
+a:focus,button:focus,input:focus,textarea:focus{outline:3px solid rgba(11,102,208,0.18);outline-offset:2px}
+@media (max-width: 900px){.cards{grid-template-columns:repeat(2,1fr)}.testimonials-grid{grid-template-columns:repeat(2,1fr)}.hero-image img{width:220px}}
+@media (max-width: 640px){.nav-menu{position:absolute;top:64px;right:16px;left:16px;flex-direction:column;background:#fff;padding:12px;border-radius:8px;display:none}.nav-menu.open{display:flex}.nav-toggle{display:block}.hero-inner{flex-direction:column;align-items:flex-start}.cards{grid-template-columns:1fr}.testimonials-grid{grid-template-columns:1fr}.hero{padding:28px 0}.hero-text h1{font-size:24px}}

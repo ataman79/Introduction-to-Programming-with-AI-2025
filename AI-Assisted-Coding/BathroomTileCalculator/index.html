@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bathroom Tile Calculator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Bathroom Tile Calculator</h1>
+
+    <form id="calcForm">
+      <fieldset>
+        <legend>Floor</legend>
+        <label>Floor width (m)
+          <input type="number" step="0.01" id="floorWidth" value="2.5" required>
+        </label>
+        <label>Floor length (m)
+          <input type="number" step="0.01" id="floorLength" value="3.0" required>
+        </label>
+        <label>Floor tile width (cm)
+          <input type="number" step="0.1" id="floorTileW" value="30" required>
+        </label>
+        <label>Floor tile length (cm)
+          <input type="number" step="0.1" id="floorTileL" value="30" required>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Walls</legend>
+        <label>Wall height (m)
+          <input type="number" step="0.01" id="wallHeight" value="2.4" required>
+        </label>
+        <label>Wall tile width (cm)
+          <input type="number" step="0.1" id="wallTileW" value="20" required>
+        </label>
+        <label>Wall tile height (cm)
+          <input type="number" step="0.1" id="wallTileH" value="20" required>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Door</legend>
+        <label>Door width (m)
+          <input type="number" step="0.01" id="doorW" value="0.8">
+        </label>
+        <label>Door height (m)
+          <input type="number" step="0.01" id="doorH" value="2.0">
+        </label>
+      </fieldset>
+
+      <div class="actions">
+        <button type="submit">Calculate</button>
+        <button type="button" id="resetBtn">Reset</button>
+      </div>
+    </form>
+
+    <section id="results">
+      <h2>Results</h2>
+      <div id="summary"></div>
+      <canvas id="viz" width="900" height="600"></canvas>
+    </section>
+
+    <p class="notes">Assumes inputs in meters for room and door, and centimeters for tile sizes. Tiles required are rounded up to whole tiles. Grout and waste allowance recommended: you can add a percentage in future.</p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

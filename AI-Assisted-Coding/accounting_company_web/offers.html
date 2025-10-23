@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Оферти — Minev</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="assets/favicon.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav container">
+      <a class="brand" href="index.html">
+        <img src="assets/logo.png" alt="Minev logo" class="brand-logo">
+        <span class="brand-name">Minev</span>
+      </a>
+      <button id="navToggle" class="nav-toggle" aria-label="Меню">☰</button>
+      <nav id="navMenu" class="nav-menu">
+        <a href="index.html" class="nav-link">Начало</a>
+        <a href="about.html" class="nav-link">За нас</a>
+        <a href="prices.html" class="nav-link">Цени</a>
+        <a href="offers.html" class="nav-link active">Оферти</a>
+        <a href="contact.html" class="nav-link">Контакти</a>
+      </nav>
+    </div>
+  </header>
+  <main class="py-5">
+    <div class="container">
+      <h1>Оферти</h1>
+      <p class="lead">Специални предложения за нови клиенти и сезонни кампании.</p>
+      <div class="offers-grid">
+        <div class="offer-card">
+          <h3>Промоция: Първи 2 месеца -50%</h3>
+          <p>За нови клиенти предлагаме 50% отстъпка за първите два месеца при подписване на договор за 12 месеца.</p>
+          <a href="contact.html" class="btn btn-primary">Свържете се</a>
+        </div>
+        <div class="offer-card">
+          <h3>Сезонна консултация</h3>
+          <p>Безплатна първоначална консултация за оптимизация на ДДС и корпоративен данък при първоначална оценка.</p>
+          <a href="contact.html" class="btn btn-primary">Запазете час</a>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>Minev</strong>
+        <div>Счетоводна кантора</div>
+      </div>
+      <div>
+        <a href="contact.html" class="btn btn-secondary">Свържи се</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      var toggle = document.getElementById('navToggle');
+      var menu = document.getElementById('navMenu');
+      toggle.addEventListener('click', function(){ menu.classList.toggle('open'); });
+    })();
+  </script>
+</body>
+</html>
