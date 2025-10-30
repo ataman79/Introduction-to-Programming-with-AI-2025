@@ -1,0 +1,1 @@
+Please create all HTML files to be responsive
