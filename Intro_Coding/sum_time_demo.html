@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>sumTimes Visualizer</title>
+  <link rel="stylesheet" href="sum_time_styles.css">
+</head>
+<body>
+  <main class="card">
+    <h1>sumTimes Visualizer</h1>
+    <p class="subtitle">Calculate the resulting time after adding a time interval</p>
+
+    <form id="tform">
+      <div class="row">
+        <label>Start Time (hh:mm)
+          <input type="time" id="t1" value="23:58">
+        </label>
+        <label>Add Time Interval (hh:mm)
+          <input type="time" id="t2" value="01:15">
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="submit">Calculate</button>
+        <button type="button" id="resetBtn">Reset</button>
+      </div>
+    </form>
+
+    <section id="visual">
+      <h2>Output</h2>
+      <div id="out" class="out"></div>
+    </section>
+
+    <aside class="notes">
+      <h3>How it works</h3>
+      <p>The function adds hours and minutes separately, handles minute overflow (≥60), and wraps the result modulo 24 hours.</p>
+      <p><strong>Example:</strong> sumTimes(23, 58, 1, 15)</p>
+      <ul>
+        <li>Minutes: 58 + 15 = 73 → 1 hour + 13 minutes</li>
+        <li>Hours: 23 + 1 + 1 = 25 → 25 % 24 = 1</li>
+        <li>Result: 01:13</li>
+      </ul>
+    </aside>
+  </main>
+
+  <script>
+    // Inline reimplementation to match sum_time.js logic
+    function sumTimes(h1, m1, h2, m2) {
+      const startTime = `${String(h1).padStart(2, '0')}:${String(m1).padStart(2, '0')}`;
+      const addTime = `${String(h2).padStart(2, '0')}:${String(m2).padStart(2, '0')}`;
+      
+      let totalMinutes = m1 + m2;
+      let totalHours = h1 + h2 + Math.floor(totalMinutes / 60);
+      totalMinutes = totalMinutes % 60;
+      totalHours = totalHours % 24;
+      
+      const resultTime = `${String(totalHours).padStart(2, '0')}:${String(totalMinutes).padStart(2, '0')}`;
+      
+      return {
+        line1: `The time is ${startTime} now.`,
+        line2: `After ${addTime} the time will be ${resultTime}.`
+      };
+    }
+
+    const form = document.getElementById('tform');
+    const out = document.getElementById('out');
+
+    function parseTimeInput(value) {
+      const [hh, mm] = value.split(':').map(s => Number(s));
+      return { hh, mm };
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const t1 = parseTimeInput(document.getElementById('t1').value);
+      const t2 = parseTimeInput(document.getElementById('t2').value);
+
+      const result = sumTimes(t1.hh, t1.mm, t2.hh, t2.mm);
+      
+      out.innerHTML = `
+        <div class="line">${result.line1}</div>
+        <div class="line">${result.line2}</div>
+      `;
+    });
+    
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('t1').value = '23:58';
+      document.getElementById('t2').value = '01:15';
+      out.innerHTML = '';
+    });
+
+    // Auto-run on page load with defaults
+    window.addEventListener('load', () => {
+      form.dispatchEvent(new Event('submit'));
+    });
+  </script>
+</body>
+</html>

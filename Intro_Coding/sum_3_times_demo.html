@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sum 3 Times Calculator</title>
+  <link rel="stylesheet" href="sum_3_times_styles.css">
+</head>
+<body>
+  <main class="card">
+    <h1>Sum 3 Times Calculator</h1>
+    <p class="subtitle">Add three time intervals and get the result in 24-hour format (wraps around)</p>
+
+    <form id="timeForm">
+      <div class="time-group">
+        <label>Time 1 (hh:mm)
+          <input type="time" id="t1" value="10:30" required>
+        </label>
+      </div>
+
+      <div class="time-group">
+        <label>Time 2 (hh:mm)
+          <input type="time" id="t2" value="05:45" required>
+        </label>
+      </div>
+
+      <div class="time-group">
+        <label>Time 3 (hh:mm)
+          <input type="time" id="t3" value="08:50" required>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="submit">Calculate Sum</button>
+        <button type="button" id="resetBtn">Reset</button>
+      </div>
+    </form>
+
+    <section id="resultSection">
+      <h2>Result</h2>
+      <div id="result" class="result-box"></div>
+      <div id="breakdown" class="breakdown"></div>
+    </section>
+
+    <aside class="notes">
+      <h3>How it works</h3>
+      <p>The function:</p>
+      <ul>
+        <li>Converts each time to total minutes (hours × 60 + minutes)</li>
+        <li>Adds all three times together</li>
+        <li>Applies modulo 1440 (24 hours) to wrap around</li>
+        <li>Converts back to HH:MM format</li>
+      </ul>
+      <p><strong>Example:</strong> 10:30 + 05:45 + 08:50 = 25:05 → wraps to 01:05</p>
+    </aside>
+  </main>
+
+  <script>
+    // Implementation matching sum_3_hours_minutes.js
+    function sum3Times(h1, m1, h2, m2, h3, m3) {
+      // Sum hours and minutes separately
+      let totalHours = h1 + h2 + h3;
+      let totalMinutes = m1 + m2 + m3;
+      
+      // Handle minute overflow (carry over to hours)
+      totalHours += Math.floor(totalMinutes / 60);
+      totalMinutes = totalMinutes % 60;
+      
+      // Wrap around 24 hours
+      totalHours = totalHours % 24;
+      
+      // Format with leading zeros (hh:mm)
+      const hh = totalHours.toString().padStart(2, '0');
+      const mm = totalMinutes.toString().padStart(2, '0');
+      
+      return `${hh}:${mm}`;
+    }
+
+    const form = document.getElementById('timeForm');
+    const result = document.getElementById('result');
+    const breakdown = document.getElementById('breakdown');
+
+    function parseTimeInput(value) {
+      const [hh, mm] = value.split(':').map(s => Number(s));
+      return { hh, mm };
+    }
+
+    function formatTime(h, m) {
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const t1 = parseTimeInput(document.getElementById('t1').value);
+      const t2 = parseTimeInput(document.getElementById('t2').value);
+      const t3 = parseTimeInput(document.getElementById('t3').value);
+
+      // Calculate result
+      const finalResult = sum3Times(t1.hh, t1.mm, t2.hh, t2.mm, t3.hh, t3.mm);
+
+      // Show result
+      result.innerHTML = `<div class="final-result">${finalResult}</div>`;
+
+      // Show breakdown
+      const m1 = t1.hh * 60 + t1.mm;
+      const m2 = t2.hh * 60 + t2.mm;
+      const m3 = t3.hh * 60 + t3.mm;
+      const total = m1 + m2 + m3;
+      const wrapped = total % 1440;
+
+      breakdown.innerHTML = `
+        <h4>Calculation Steps:</h4>
+        <ul>
+          <li><strong>Time 1:</strong> ${formatTime(t1.hh, t1.mm)} = ${m1} minutes</li>
+          <li><strong>Time 2:</strong> ${formatTime(t2.hh, t2.mm)} = ${m2} minutes</li>
+          <li><strong>Time 3:</strong> ${formatTime(t3.hh, t3.mm)} = ${m3} minutes</li>
+          <li><strong>Total:</strong> ${m1} + ${m2} + ${m3} = ${total} minutes</li>
+          ${total >= 1440 ? `<li><strong>Wrapped:</strong> ${total} % 1440 = ${wrapped} minutes</li>` : ''}
+          <li><strong>Result:</strong> ${Math.floor(wrapped / 60)} hours and ${wrapped % 60} minutes = <span class="highlight">${finalResult}</span></li>
+        </ul>
+      `;
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('t1').value = '10:30';
+      document.getElementById('t2').value = '05:45';
+      document.getElementById('t3').value = '08:50';
+      result.innerHTML = '';
+      breakdown.innerHTML = '';
+    });
+
+    // Auto-run on page load with defaults
+    window.addEventListener('load', () => {
+      form.dispatchEvent(new Event('submit'));
+    });
+  </script>
+</body>
+</html>

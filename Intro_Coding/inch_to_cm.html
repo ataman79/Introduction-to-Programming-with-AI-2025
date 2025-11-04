@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inch to Centimeter Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .converter-box {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .examples {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .examples h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .example-item {
+            padding: 10px;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #555;
+            border-left: 4px solid #667eea;
+        }
+
+        .arrow {
+            color: #667eea;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📏 Inch to Centimeter Converter</h1>
+        
+        <div class="converter-box">
+            <div class="input-group">
+                <label for="inches">Enter Inches:</label>
+                <input type="number" id="inches" placeholder="e.g., 10" step="0.01" value="0">
+            </div>
+            
+            <div class="result" id="result">
+                0.00 cm
+            </div>
+        </div>
+
+        <div class="examples">
+            <h3>Examples:</h3>
+            <div class="example-item">
+                1 inch <span class="arrow">→</span> 2.54 cm
+            </div>
+            <div class="example-item">
+                10 inches <span class="arrow">→</span> 25.4 cm
+            </div>
+            <div class="example-item">
+                5.5 inches <span class="arrow">→</span> 13.97 cm
+            </div>
+            <div class="example-item">
+                12.75 inches <span class="arrow">→</span> 32.39 cm
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function inchToCm(inches) {
+            // Conversion factor: 1 inch = 2.54 cm
+            const cm = inches * 2.54;
+            
+            // Round to 2 decimal places
+            return Math.round(cm * 100) / 100;
+        }
+
+        const inchesInput = document.getElementById('inches');
+        const resultDiv = document.getElementById('result');
+
+        function updateResult() {
+            const inches = parseFloat(inchesInput.value) || 0;
+            const cm = inchToCm(inches);
+            resultDiv.textContent = `${cm.toFixed(2)} cm`;
+        }
+
+        // Update on input
+        inchesInput.addEventListener('input', updateResult);
+
+        // Initial update
+        updateResult();
+    </script>
+</body>
+</html>

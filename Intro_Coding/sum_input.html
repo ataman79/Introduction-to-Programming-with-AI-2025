@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sum 3 Numbers — Demo</title>
+  <link rel="stylesheet" href="sum_styles.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Sum 3 Numbers</h1>
+
+    <form id="sumForm">
+      <label>Number A
+        <input type="number" id="a" value="0" required>
+      </label>
+      <label>Number B
+        <input type="number" id="b" value="0" required>
+      </label>
+      <label>Number C
+        <input type="number" id="c" value="0" required>
+      </label>
+
+      <div class="actions">
+        <button type="submit">Calculate</button>
+        <button type="button" id="resetBtn">Reset</button>
+      </div>
+    </form>
+
+    <section id="result" aria-live="polite" class="result"></section>
+  </main>
+
+  <!-- Load the existing function file -->
+  <script src="sum_3_numbers.js"></script>
+  <script>
+    const form = document.getElementById('sumForm');
+    const result = document.getElementById('result');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const a = Number(document.getElementById('a').value);
+      const b = Number(document.getElementById('b').value);
+      const c = Number(document.getElementById('c').value);
+
+      if (typeof sumNumbers !== 'function') {
+        result.innerHTML = '<span class="error">Error: sumNumbers() is not available.</span>';
+        return;
+      }
+
+      const s = sumNumbers(a, b, c);
+      result.innerHTML = `<div class="out"><strong>Result:</strong> ${s}</div>`;
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      form.reset();
+      result.textContent = '';
+    });
+  </script>
+</body>
+</html>
