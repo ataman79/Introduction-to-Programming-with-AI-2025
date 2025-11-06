@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greater of Two Numbers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .vs-symbol {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .comparison-visual {
+            margin-top: 30px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .comparison-visual.show {
+            display: block;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .numbers-display {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+
+        .number-box {
+            flex: 1;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 36px;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+
+        .number-box.winner {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            transform: scale(1.1);
+            border-color: #11998e;
+            box-shadow: 0 10px 30px rgba(17, 153, 142, 0.3);
+        }
+
+        .number-box.loser {
+            background: #e0e0e0;
+            color: #999;
+        }
+
+        .number-box.tie {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-color: #f5576c;
+        }
+
+        .comparison-symbol {
+            font-size: 48px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .result-text {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .result-number {
+            font-size: 48px;
+            color: #11998e;
+            margin: 10px 0;
+        }
+
+        .history {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+
+        .history h3 {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+        }
+
+        .history-numbers {
+            color: #555;
+        }
+
+        .history-result {
+            font-weight: bold;
+            color: #11998e;
+            font-size: 20px;
+        }
+
+        .clear-history {
+            margin-top: 15px;
+            padding: 10px;
+            font-size: 14px;
+            background: #f44336;
+        }
+
+        .clear-history:hover {
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+        }
+
+        .error-message {
+            background: #ff9800;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏆 Greater of Two Numbers</h1>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label for="number1">First Number:</label>
+                <input type="number" id="number1" placeholder="Enter first number..." autofocus>
+            </div>
+            
+            <div class="vs-symbol">VS</div>
+            
+            <div class="input-group">
+                <label for="number2">Second Number:</label>
+                <input type="number" id="number2" placeholder="Enter second number...">
+            </div>
+        </div>
+
+        <button onclick="compareNumbers()">Compare Numbers</button>
+
+        <div id="errorMessage" class="error-message"></div>
+
+        <div id="comparisonVisual" class="comparison-visual">
+            <div class="numbers-display">
+                <div id="box1" class="number-box">
+                    <div style="font-size: 14px; color: inherit; margin-bottom: 10px;">Number 1</div>
+                    <div id="displayNum1"></div>
+                </div>
+                <div class="comparison-symbol" id="compSymbol"></div>
+                <div id="box2" class="number-box">
+                    <div style="font-size: 14px; color: inherit; margin-bottom: 10px;">Number 2</div>
+                    <div id="displayNum2"></div>
+                </div>
+            </div>
+            <div class="result-text">
+                <div>The greater number is:</div>
+                <div class="result-number" id="resultNumber"></div>
+            </div>
+        </div>
+
+        <div class="history">
+            <h3>Comparison History</h3>
+            <div id="historyList" class="history-list"></div>
+            <button class="clear-history" onclick="clearHistory()" style="display: none;" id="clearBtn">Clear History</button>
+        </div>
+    </div>
+
+    <script>
+        // Greater of two numbers function from greater_two_numbers.js
+        function greaterOfTwo(num1, num2) {
+            if (num1 > num2) {
+                return num1;
+            } else {
+                return num2;
+            }
+        }
+
+        let history = [];
+
+        function compareNumbers() {
+            const input1 = document.getElementById('number1');
+            const input2 = document.getElementById('number2');
+            const errorMessage = document.getElementById('errorMessage');
+            const comparisonVisual = document.getElementById('comparisonVisual');
+
+            const num1 = parseFloat(input1.value);
+            const num2 = parseFloat(input2.value);
+
+            // Validation
+            if (input1.value === '' || input2.value === '' || isNaN(num1) || isNaN(num2)) {
+                showError('⚠️ Please enter valid numbers in both fields!');
+                comparisonVisual.classList.remove('show');
+                return;
+            }
+
+            errorMessage.classList.remove('show');
+
+            // Get the greater number
+            const result = greaterOfTwo(num1, num2);
+
+            // Display visual comparison
+            displayComparison(num1, num2, result);
+
+            // Add to history
+            addToHistory(num1, num2, result);
+        }
+
+        function displayComparison(num1, num2, result) {
+            const comparisonVisual = document.getElementById('comparisonVisual');
+            const box1 = document.getElementById('box1');
+            const box2 = document.getElementById('box2');
+            const displayNum1 = document.getElementById('displayNum1');
+            const displayNum2 = document.getElementById('displayNum2');
+            const compSymbol = document.getElementById('compSymbol');
+            const resultNumber = document.getElementById('resultNumber');
+
+            displayNum1.textContent = num1;
+            displayNum2.textContent = num2;
+            resultNumber.textContent = result;
+
+            // Reset classes
+            box1.className = 'number-box';
+            box2.className = 'number-box';
+
+            // Determine comparison
+            if (num1 > num2) {
+                box1.classList.add('winner');
+                box2.classList.add('loser');
+                compSymbol.textContent = '>';
+            } else if (num2 > num1) {
+                box2.classList.add('winner');
+                box1.classList.add('loser');
+                compSymbol.textContent = '<';
+            } else {
+                box1.classList.add('tie');
+                box2.classList.add('tie');
+                compSymbol.textContent = '=';
+            }
+
+            comparisonVisual.classList.add('show');
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 3000);
+        }
+
+        function addToHistory(num1, num2, result) {
+            const comparison = num1 > num2 ? '>' : (num2 > num1 ? '<' : '=');
+            history.unshift({ num1, num2, result, comparison });
+            if (history.length > 10) {
+                history.pop();
+            }
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            const clearBtn = document.getElementById('clearBtn');
+
+            if (history.length === 0) {
+                historyList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No comparisons yet</p>';
+                clearBtn.style.display = 'none';
+            } else {
+                historyList.innerHTML = history.map(item => `
+                    <div class="history-item">
+                        <span class="history-numbers">${item.num1} ${item.comparison} ${item.num2}</span>
+                        <span class="history-result">${item.result}</span>
+                    </div>
+                `).join('');
+                clearBtn.style.display = 'block';
+            }
+        }
+
+        function clearHistory() {
+            history = [];
+            updateHistoryDisplay();
+        }
+
+        // Allow Enter key to compare numbers
+        document.getElementById('number1').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                document.getElementById('number2').focus();
+            }
+        });
+
+        document.getElementById('number2').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                compareNumbers();
+            }
+        });
+
+        // Initialize history display
+        updateHistoryDisplay();
+    </script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odd or Even Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .result.show {
+            opacity: 1;
+        }
+
+        .result.even {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .result.odd {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .result-number {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .history {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+
+        .history h3 {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+        }
+
+        .history-item.even {
+            background-color: #e8eaf6;
+            color: #667eea;
+        }
+
+        .history-item.odd {
+            background-color: #fce4ec;
+            color: #f5576c;
+        }
+
+        .clear-history {
+            margin-top: 15px;
+            padding: 10px;
+            font-size: 14px;
+            background: #f44336;
+        }
+
+        .clear-history:hover {
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔢 Odd or Even Checker</h1>
+        
+        <div class="input-group">
+            <label for="numberInput">Enter a number:</label>
+            <input type="number" id="numberInput" placeholder="Type any number..." autofocus>
+        </div>
+
+        <button onclick="checkNumber()">Check Number</button>
+
+        <div id="result" class="result"></div>
+
+        <div class="history">
+            <h3>History</h3>
+            <div id="historyList" class="history-list"></div>
+            <button class="clear-history" onclick="clearHistory()" style="display: none;" id="clearBtn">Clear History</button>
+        </div>
+    </div>
+
+    <script>
+        // Odd or Even function from odd_or_even.js
+        function oddOrEven(number) {
+            if (number % 2 === 0) {
+                return "even";
+            } else {
+                return "odd";
+            }
+        }
+
+        let history = [];
+
+        function checkNumber() {
+            const input = document.getElementById('numberInput');
+            const resultDiv = document.getElementById('result');
+            const number = parseFloat(input.value);
+
+            if (input.value === '' || isNaN(number)) {
+                resultDiv.innerHTML = '⚠️ Please enter a valid number!';
+                resultDiv.className = 'result show';
+                resultDiv.style.background = '#ff9800';
+                resultDiv.style.color = 'white';
+                return;
+            }
+
+            // Check if it's a whole number
+            if (!Number.isInteger(number)) {
+                resultDiv.innerHTML = '⚠️ Please enter a whole number!';
+                resultDiv.className = 'result show';
+                resultDiv.style.background = '#ff9800';
+                resultDiv.style.color = 'white';
+                return;
+            }
+
+            const result = oddOrEven(number);
+            
+            // Display result
+            resultDiv.innerHTML = `
+                <div class="result-number">${number}</div>
+                <div>is ${result.toUpperCase()}</div>
+            `;
+            resultDiv.className = `result show ${result}`;
+
+            // Add to history
+            addToHistory(number, result);
+        }
+
+        function addToHistory(number, result) {
+            history.unshift({ number, result });
+            if (history.length > 10) {
+                history.pop();
+            }
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            const clearBtn = document.getElementById('clearBtn');
+
+            if (history.length === 0) {
+                historyList.innerHTML = '<p style="color: #999; text-align: center;">No checks yet</p>';
+                clearBtn.style.display = 'none';
+            } else {
+                historyList.innerHTML = history.map(item => `
+                    <div class="history-item ${item.result}">
+                        <span><strong>${item.number}</strong></span>
+                        <span>${item.result.toUpperCase()}</span>
+                    </div>
+                `).join('');
+                clearBtn.style.display = 'block';
+            }
+        }
+
+        function clearHistory() {
+            history = [];
+            updateHistoryDisplay();
+        }
+
+        // Allow Enter key to check number
+        document.getElementById('numberInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                checkNumber();
+            }
+        });
+
+        // Initialize history display
+        updateHistoryDisplay();
+    </script>
+</body>
+</html>

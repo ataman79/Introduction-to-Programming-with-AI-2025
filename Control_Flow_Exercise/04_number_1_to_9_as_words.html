@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number to Words Converter (1-9)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .number-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .number-btn {
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #555;
+        }
+
+        .number-btn:hover {
+            border-color: #667eea;
+            background: #f0f0f0;
+        }
+
+        .number-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        button.convert {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button.convert:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button.convert:active {
+            transform: translateY(0);
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-display {
+            text-align: center;
+        }
+
+        .input-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .arrow {
+            font-size: 32px;
+            color: #764ba2;
+            margin: 15px 0;
+        }
+
+        .output-word {
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-transform: capitalize;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .error-message {
+            background: #ff9800;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .history {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+
+        .history h3 {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            background: white;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+        }
+
+        .history-input {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .history-arrow {
+            margin: 0 10px;
+            color: #999;
+        }
+
+        .history-output {
+            font-weight: 600;
+            color: #764ba2;
+        }
+
+        .clear-history {
+            margin-top: 15px;
+            padding: 10px;
+            font-size: 14px;
+            background: #f44336;
+            color: white;
+            width: 100%;
+        }
+
+        .clear-history:hover {
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+        }
+
+        .button-label {
+            font-size: 12px;
+            color: #999;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔤 Number to Words (1-9)</h1>
+        
+        <div class="info-box">
+            💡 Click a number button or enter a number between 1 and 9 to convert it to English words.
+        </div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <label for="numberInput">Enter a number (1-9):</label>
+                <input type="number" id="numberInput" placeholder="Type a number..." min="1" max="9" autofocus>
+            </div>
+
+            <div>
+                <label>Quick Select:</label>
+                <div class="number-buttons">
+                    <button class="number-btn" onclick="selectNumber(1)">1</button>
+                    <button class="number-btn" onclick="selectNumber(2)">2</button>
+                    <button class="number-btn" onclick="selectNumber(3)">3</button>
+                    <button class="number-btn" onclick="selectNumber(4)">4</button>
+                    <button class="number-btn" onclick="selectNumber(5)">5</button>
+                    <button class="number-btn" onclick="selectNumber(6)">6</button>
+                    <button class="number-btn" onclick="selectNumber(7)">7</button>
+                    <button class="number-btn" onclick="selectNumber(8)">8</button>
+                    <button class="number-btn" onclick="selectNumber(9)">9</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="convert" onclick="convertToWords()">Convert to Words</button>
+
+        <div id="errorMessage" class="error-message"></div>
+
+        <div id="resultSection" class="result-section">
+            <div class="result-display">
+                <div class="input-number" id="inputDisplay"></div>
+                <div class="arrow">⬇️</div>
+                <div class="output-word" id="outputWord"></div>
+            </div>
+        </div>
+
+        <div class="history">
+            <h3>Conversion History</h3>
+            <div id="historyList" class="history-list"></div>
+            <button class="clear-history" onclick="clearHistory()" style="display: none;" id="clearBtn">Clear History</button>
+        </div>
+    </div>
+
+    <script>
+        // Number to Words function from number_1_to_9_as_words.js
+        function numberToWords(num) {
+            switch(num) {
+                case 1:
+                    return "one";
+                case 2:
+                    return "two";
+                case 3:
+                    return "three";
+                case 4:
+                    return "four";
+                case 5:
+                    return "five";
+                case 6:
+                    return "six";
+                case 7:
+                    return "seven";
+                case 8:
+                    return "eight";
+                case 9:
+                    return "nine";
+                default:
+                    return "out of range";
+            }
+        }
+
+        let history = [];
+
+        function selectNumber(num) {
+            document.getElementById('numberInput').value = num;
+            updateButtonStates(num);
+            convertToWords();
+        }
+
+        function updateButtonStates(num) {
+            const buttons = document.querySelectorAll('.number-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeBtn = document.querySelector(`.number-btn:nth-child(${num})`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        }
+
+        function convertToWords() {
+            const input = document.getElementById('numberInput');
+            const resultSection = document.getElementById('resultSection');
+            const errorMessage = document.getElementById('errorMessage');
+
+            const num = parseInt(input.value);
+
+            // Validation
+            if (input.value === '' || isNaN(num) || num < 1 || num > 9) {
+                showError('⚠️ Please enter a valid number between 1 and 9!');
+                resultSection.classList.remove('show');
+                return;
+            }
+
+            errorMessage.classList.remove('show');
+
+            // Convert to words
+            const word = numberToWords(num);
+
+            // Display result
+            document.getElementById('inputDisplay').textContent = num;
+            document.getElementById('outputWord').textContent = word;
+            resultSection.classList.add('show');
+
+            // Add to history
+            addToHistory(num, word);
+
+            // Update button states
+            updateButtonStates(num);
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 3000);
+        }
+
+        function addToHistory(num, word) {
+            history.unshift({ num, word });
+            if (history.length > 15) {
+                history.pop();
+            }
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            const clearBtn = document.getElementById('clearBtn');
+
+            if (history.length === 0) {
+                historyList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No conversions yet</p>';
+                clearBtn.style.display = 'none';
+            } else {
+                historyList.innerHTML = history.map(item => `
+                    <div class="history-item">
+                        <span class="history-input">${item.num}</span>
+                        <span class="history-arrow">→</span>
+                        <span class="history-output">${item.word}</span>
+                    </div>
+                `).join('');
+                clearBtn.style.display = 'block';
+            }
+        }
+
+        function clearHistory() {
+            history = [];
+            updateHistoryDisplay();
+        }
+
+        // Allow Enter key to convert
+        document.getElementById('numberInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                convertToWords();
+            }
+        });
+
+        // Update button state on input change
+        document.getElementById('numberInput').addEventListener('input', function() {
+            const num = parseInt(this.value);
+            if (!isNaN(num) && num >= 1 && num <= 9) {
+                updateButtonStates(num);
+            }
+        });
+
+        // Initialize history display
+        updateHistoryDisplay();
+    </script>
+</body>
+</html>
