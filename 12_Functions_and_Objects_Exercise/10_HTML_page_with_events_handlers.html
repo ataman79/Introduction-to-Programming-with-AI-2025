@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Size Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+        
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .form-control {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        input {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        input::placeholder {
+            color: #999;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #output {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            min-height: 100px;
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .size-item {
+            margin: 12px 0;
+            padding: 10px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+            transition: all 0.2s ease;
+        }
+        
+        .size-item:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text Size Generator</h1>
+        
+        <div class="input-group">
+            <div class="form-control">
+                <label for="startSize">Start Size (pt):</label>
+                <input 
+                    type="number" 
+                    id="startSize" 
+                    placeholder="e.g., 5" 
+                    min="0" 
+                    max="99"
+                >
+            </div>
+            <div class="form-control">
+                <label for="endSize">End Size (pt):</label>
+                <input 
+                    type="number" 
+                    id="endSize" 
+                    placeholder="e.g., 20" 
+                    min="1" 
+                    max="100"
+                >
+            </div>
+        </div>
+        
+        <button onclick="printText()">Print Text</button>
+        
+        <div id="output"></div>
+    </div>
+
+    <script>
+        function printText() {
+            const startSizeInput = document.getElementById('startSize').value;
+            const endSizeInput = document.getElementById('endSize').value;
+            const outputDiv = document.getElementById('output');
+            
+            // Validate inputs
+            if (startSizeInput === '' || endSizeInput === '') {
+                outputDiv.innerHTML = '<div class="error">Please enter both start and end sizes</div>';
+                return;
+            }
+            
+            const startSize = parseInt(startSizeInput);
+            const endSize = parseInt(endSizeInput);
+            
+            // Check range validity: 0 < start size < end size < 100
+            if (startSize <= 0 || startSize >= endSize || endSize >= 100) {
+                outputDiv.innerHTML = '<div class="error">Invalid range</div>';
+                return;
+            }
+            
+            // Generate output
+            let html = '';
+            for (let i = startSize; i <= endSize; i++) {
+                html += `<div class="size-item" style="font-size: ${i}pt">Size ${i}</div>`;
+            }
+            
+            outputDiv.innerHTML = html;
+        }
+        
+        // Allow Enter key to trigger the function
+        document.getElementById('startSize').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') printText();
+        });
+        
+        document.getElementById('endSize').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') printText();
+        });
+    </script>
+</body>
+</html>

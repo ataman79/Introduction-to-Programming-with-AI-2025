@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorful Figures Visualization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        #canvas {
+            border: 2px solid #333;
+            display: block;
+            margin: 20px auto;
+            background-color: #fafafa;
+        }
+        .info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .figure-info {
+            background-color: #f9f9f9;
+            border-left: 4px solid;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .figure-info h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .figure-info p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .figure-info .area {
+            font-weight: bold;
+            color: #2196F3;
+        }
+        .figure-info .perimeter {
+            font-weight: bold;
+            color: #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Colorful Figures Visualization</h1>
+        <p class="subtitle">Interactive canvas showing various geometric shapes with colors</p>
+        
+        <canvas id="canvas" width="800" height="600"></canvas>
+        
+        <div class="info" id="figureInfo"></div>
+    </div>
+
+    <script>
+        // Color class
+        class Color {
+            constructor(red, green, blue) {
+                this.red = red;
+                this.green = green;
+                this.blue = blue;
+            }
+            
+            toRgb() {
+                return `rgb(${this.red}, ${this.green}, ${this.blue})`;
+            }
+            
+            toString() {
+                const toHex = (value) => {
+                    const hex = value.toString(16).toUpperCase();
+                    return hex.length === 1 ? '0' + hex : hex;
+                };
+                return `#${toHex(this.red)}${toHex(this.green)}${toHex(this.blue)}`;
+            }
+        }
+
+        // Figure classes
+        class Figure {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+        }
+
+        class ColorfulFigure extends Figure {
+            constructor(x, y, color) {
+                super(x, y);
+                this.color = color;
+            }
+        }
+
+        class ColorfulSquare extends ColorfulFigure {
+            constructor(x, y, width, color) {
+                super(x, y, color);
+                this.width = width;
+            }
+            
+            area() {
+                return this.width * this.width;
+            }
+            
+            perimeter() {
+                return 4 * this.width;
+            }
+            
+            draw(ctx) {
+                ctx.fillStyle = this.color.toRgb();
+                ctx.fillRect(this.x - this.width / 2, this.y - this.width / 2, this.width, this.width);
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(this.x - this.width / 2, this.y - this.width / 2, this.width, this.width);
+            }
+            
+            toString() {
+                return `ColorfulSquare at ({${this.x}, ${this.y}}), width = ${this.width}, color = ${this.color.toString()}`;
+            }
+        }
+
+        class ColorfulRectangle extends ColorfulFigure {
+            constructor(x, y, width, height, color) {
+                super(x, y, color);
+                this.width = width;
+                this.height = height;
+            }
+            
+            area() {
+                return this.width * this.height;
+            }
+            
+            perimeter() {
+                return 2 * (this.width + this.height);
+            }
+            
+            draw(ctx) {
+                ctx.fillStyle = this.color.toRgb();
+                ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            }
+            
+            toString() {
+                return `ColorfulRectangle at ({${this.x}, ${this.y}}), size = ${this.width} x ${this.height}, color = ${this.color.toString()}`;
+            }
+        }
+
+        class ColorfulCircle extends ColorfulFigure {
+            constructor(x, y, radius, color) {
+                super(x, y, color);
+                this.radius = radius;
+            }
+            
+            area() {
+                return Math.PI * this.radius * this.radius;
+            }
+            
+            perimeter() {
+                return 2 * Math.PI * this.radius;
+            }
+            
+            draw(ctx) {
+                ctx.fillStyle = this.color.toRgb();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            toString() {
+                return `ColorfulCircle at ({${this.x}, ${this.y}}), radius = ${this.radius}, color = ${this.color.toString()}`;
+            }
+        }
+
+        class ColorfulAnnulus extends ColorfulFigure {
+            constructor(x, y, outterRadius, innerRadius, color) {
+                super(x, y, color);
+                this.outterRadius = outterRadius;
+                this.innerRadius = innerRadius;
+            }
+            
+            area() {
+                return Math.PI * (this.outterRadius * this.outterRadius - this.innerRadius * this.innerRadius);
+            }
+            
+            perimeter() {
+                return 2 * Math.PI * (this.outterRadius + this.innerRadius);
+            }
+            
+            draw(ctx) {
+                // Draw outer circle
+                ctx.fillStyle = this.color.toRgb();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.outterRadius, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Clear inner circle
+                ctx.fillStyle = '#fafafa';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.innerRadius, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Stroke both circles
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.outterRadius, 0, 2 * Math.PI);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.innerRadius, 0, 2 * Math.PI);
+                ctx.stroke();
+            }
+            
+            toString() {
+                return `ColorfulAnnulus at ({${this.x}, ${this.y}}), ext. radius = ${this.outterRadius}, int. radius = ${this.innerRadius}, color = ${this.color.toString()}`;
+            }
+        }
+
+        // Create figures
+        const figures = [
+            new ColorfulSquare(80, 100, 60, new Color(255, 122, 30)),
+            new ColorfulRectangle(250, 120, 100, 60, new Color(127, 170, 232)),
+            new ColorfulCircle(450, 120, 50, new Color(0, 238, 0)),
+            new ColorfulAnnulus(650, 140, 60, 30, new Color(238, 51, 51)),
+            new ColorfulSquare(150, 330, 50, new Color(255, 0, 127)),
+            new ColorfulRectangle(350, 330, 80, 50, new Color(0, 200, 100)),
+            new ColorfulCircle(550, 340, 40, new Color(100, 150, 255)),
+            new ColorfulAnnulus(700, 340, 50, 25, new Color(255, 200, 0))
+        ];
+
+        // Draw on canvas
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Clear canvas
+        ctx.fillStyle = '#fafafa';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw all figures
+        figures.forEach(figure => {
+            figure.draw(ctx);
+        });
+
+        // Display figure information
+        const infoDiv = document.getElementById('figureInfo');
+        figures.forEach((figure, index) => {
+            const div = document.createElement('div');
+            div.className = 'figure-info';
+            div.style.borderLeftColor = figure.color.toRgb();
+            
+            div.innerHTML = `
+                <h3>Figure ${index + 1}: ${figure.constructor.name}</h3>
+                <p><strong>Position:</strong> (${figure.x}, ${figure.y})</p>
+                <p><strong>Color:</strong> ${figure.color.toString()}</p>
+                <p class="area"><strong>Area:</strong> ${figure.area().toFixed(2)} px²</p>
+                <p class="perimeter"><strong>Perimeter:</strong> ${figure.perimeter().toFixed(2)} px</p>
+            `;
+            
+            infoDiv.appendChild(div);
+        });
+    </script>
+</body>
+</html>

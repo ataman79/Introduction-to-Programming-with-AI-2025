@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geographic Area Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        #map {
+            width: 100%;
+            height: 500px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #calculateBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #calculateBtn:hover {
+            background-color: #45a049;
+        }
+        #clearBtn {
+            background-color: #f44336;
+            color: white;
+        }
+        #clearBtn:hover {
+            background-color: #da190b;
+        }
+        #undoBtn {
+            background-color: #ff9800;
+            color: white;
+        }
+        #undoBtn:hover {
+            background-color: #e68900;
+        }
+        .info {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .info p {
+            margin: 5px 0;
+        }
+        .result {
+            background-color: #c8e6c9;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            display: none;
+        }
+        .result.show {
+            display: block;
+        }
+        .point-count {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Geographic Area Calculator</h1>
+        
+        <div class="info">
+            <p><strong>Instructions:</strong></p>
+            <p>1. Click on the map to add points for your polygon</p>
+            <p>2. Points will be connected with lines as you add them</p>
+            <p>3. Click "Calculate Area" to compute the area in square meters</p>
+            <p>4. Use "Undo" to remove the last point or "Clear" to start over</p>
+            <p class="point-count">Points added: <strong id="pointCount">0</strong></p>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="controls">
+            <button id="calculateBtn">Calculate Area</button>
+            <button id="undoBtn">Undo Last Point</button>
+            <button id="clearBtn">Clear All</button>
+        </div>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        // Initialize map
+        const map = L.map('map').setView([42.6977, 23.3219], 13); // Sofia, Bulgaria
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Data storage
+        let points = [];
+        let polyline = null;
+        let markers = [];
+
+        // Add point on map click
+        map.on('click', function(e) {
+            const lat = e.latlng.lat;
+            const lng = e.latlng.lng;
+            
+            // Add point to array
+            points.push({latitude: lat, longitude: lng});
+            
+            // Add marker
+            const marker = L.circleMarker([lat, lng], {
+                radius: 6,
+                fillColor: '#2196F3',
+                color: '#1976D2',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(map);
+            
+            markers.push(marker);
+            
+            // Update polyline
+            updatePolyline();
+            
+            // Update point count
+            document.getElementById('pointCount').textContent = points.length;
+        });
+
+        function updatePolyline() {
+            // Remove old polyline
+            if (polyline) {
+                map.removeLayer(polyline);
+            }
+            
+            if (points.length >= 2) {
+                // Create polyline connecting all points
+                const latLngs = points.map(p => [p.latitude, p.longitude]);
+                polyline = L.polyline(latLngs, {
+                    color: '#2196F3',
+                    weight: 2,
+                    opacity: 0.7,
+                    dashArray: '5, 5'
+                }).addTo(map);
+            }
+        }
+
+        // Calculate area function
+        function calculateGeoArea(...locations) {
+            const R = 6371000; // Earth radius in meters
+            
+            // Convert degrees to radians
+            function toRadians(degrees) {
+                return degrees * (Math.PI / 180);
+            }
+            
+            // Calculate area using the spherical excess formula
+            let S = 0; // Spherical excess
+            
+            for (let i = 0; i < locations.length; i++) {
+                const p1 = locations[i];
+                const p2 = locations[(i + 1) % locations.length];
+                
+                const lat1 = toRadians(p1.latitude);
+                const lon1 = toRadians(p1.longitude);
+                const lat2 = toRadians(p2.latitude);
+                const lon2 = toRadians(p2.longitude);
+                
+                // Calculate the spherical excess contribution
+                S += (lon2 - lon1) * (2 + Math.sin(lat1) + Math.sin(lat2));
+            }
+            
+            S = Math.abs(S) / 2;
+            
+            // Area of spherical polygon = E * R²
+            const area = Math.abs(S * R * R);
+            return area;
+        }
+
+        // Calculate button click
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            if (points.length < 3) {
+                alert('Please add at least 3 points to calculate the area!');
+                return;
+            }
+            
+            const area = calculateGeoArea(...points);
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = `Area: ${area.toFixed(2)} m² (${(area / 10000).toFixed(2)} hectares)`;
+            resultDiv.classList.add('show');
+        });
+
+        // Undo button click
+        document.getElementById('undoBtn').addEventListener('click', function() {
+            if (points.length === 0) return;
+            
+            points.pop();
+            const marker = markers.pop();
+            map.removeLayer(marker);
+            updatePolyline();
+            document.getElementById('pointCount').textContent = points.length;
+            document.getElementById('result').classList.remove('show');
+        });
+
+        // Clear button click
+        document.getElementById('clearBtn').addEventListener('click', function() {
+            points = [];
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            
+            if (polyline) {
+                map.removeLayer(polyline);
+                polyline = null;
+            }
+            
+            document.getElementById('pointCount').textContent = '0';
+            document.getElementById('result').classList.remove('show');
+        });
+    </script>
+</body>
+</html>
