@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sofia Plots of Land - Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: white;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h1 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .location-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .location-info h3 {
+            color: #1976d2;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .location-coords {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .location-coords strong {
+            color: #333;
+        }
+
+        .plots-section h3 {
+            color: #333;
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .plot-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            background: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .plot-item:hover {
+            background: #f0f7f0;
+            transform: translateX(5px);
+        }
+
+        .plot-item.crossing {
+            background: #fff3e0;
+            border-left-color: #ff9800;
+        }
+
+        .plot-item.crossing:hover {
+            background: #ffe0b2;
+        }
+
+        .plot-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .plot-coords {
+            font-size: 12px;
+            color: #777;
+            line-height: 1.4;
+        }
+
+        .status {
+            font-size: 11px;
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px solid #e0e0e0;
+            color: #ff9800;
+            font-weight: 600;
+        }
+
+        .canvas-container {
+            flex: 1;
+            background: white;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #canvas {
+            max-width: 100%;
+            max-height: 100%;
+            border: 1px solid #ddd;
+        }
+
+        .legend {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 3px;
+            border: 1px solid #999;
+        }
+
+        .legend-color.location {
+            background: #2196F3;
+        }
+
+        .legend-color.crossing {
+            background: #ff9800;
+        }
+
+        .legend-color.non-crossing {
+            background: #4CAF50;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 30vh;
+            }
+
+            .canvas-container {
+                height: 70vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>🗺️ Sofia Locations</h1>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color location"></div>
+                    <span>Current Location</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color crossing"></div>
+                    <span>Crossing Plot</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color non-crossing"></div>
+                    <span>Other Plot</span>
+                </div>
+            </div>
+
+            <div class="location-info">
+                <h3>📍 Current Location</h3>
+                <div class="location-coords">
+                    <div><strong>Name:</strong> Park Coffee Club</div>
+                    <div><strong>Latitude:</strong> 42.686851</div>
+                    <div><strong>Longitude:</strong> 23.336146</div>
+                </div>
+            </div>
+
+            <div class="plots-section">
+                <h3>Nearby Plots</h3>
+                <div id="plotsList"></div>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Function to check if location crosses a plot
+        function checkCrossingPlots({location, lat, long}, ...plots) {
+            const crossingPlots = [];
+            for (let plot of plots) {
+                if (lat >= plot.S && lat <= plot.N &&
+                    long >= plot.W && long <= plot.E) {
+                    crossingPlots.push(plot);
+                }
+            }
+            return crossingPlots;
+        }
+
+        // Data
+        const location = {location:"Park Coffee Club", lat: 42.686851, long: 23.336146};
+        const plots = [
+            {name:"Borisova Gradina Park", S: 42.677265, W: 23.331184, N: 42.690606, E: 23.347621},
+            {name:"Vasil Levski Stadium", S: 42.686344, W: 23.332922, N: 42.689106, E: 23.337278},
+            {name:"Bulgarian Army Stadium", S: 42.683029, W: 23.338244, N: 42.685191, E: 23.341355},
+            {name:"Tennis Club Levski", S: 42.686102, W: 23.336007, N: 42.687132, E: 23.337734}
+        ];
+
+        const crossingPlots = checkCrossingPlots(location, ...plots);
+
+        // Canvas setup
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size
+        canvas.width = 800;
+        canvas.height = 600;
+
+        // Calculate bounds
+        let minLat = location.lat, maxLat = location.lat;
+        let minLong = location.long, maxLong = location.long;
+
+        plots.forEach(plot => {
+            minLat = Math.min(minLat, plot.S);
+            maxLat = Math.max(maxLat, plot.N);
+            minLong = Math.min(minLong, plot.W);
+            maxLong = Math.max(maxLong, plot.E);
+        });
+
+        // Add padding
+        const latPadding = (maxLat - minLat) * 0.1;
+        const longPadding = (maxLong - minLong) * 0.1;
+        minLat -= latPadding;
+        maxLat += latPadding;
+        minLong -= longPadding;
+        maxLong += longPadding;
+
+        // Conversion functions
+        function latToY(lat) {
+            return canvas.height - ((lat - minLat) / (maxLat - minLat)) * canvas.height;
+        }
+
+        function longToX(long) {
+            return ((long - minLong) / (maxLong - minLong)) * canvas.width;
+        }
+
+        // Draw background
+        ctx.fillStyle = '#f0f0f0';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw grid
+        ctx.strokeStyle = '#ddd';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 10; i++) {
+            const x = (canvas.width / 10) * i;
+            const y = (canvas.height / 10) * i;
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+        }
+
+        // Draw plots
+        plots.forEach(plot => {
+            const isCrossing = crossingPlots.some(p => p.name === plot.name);
+            const x1 = longToX(plot.W);
+            const x2 = longToX(plot.E);
+            const y1 = latToY(plot.N);
+            const y2 = latToY(plot.S);
+
+            // Fill
+            ctx.fillStyle = isCrossing ? 'rgba(255, 152, 0, 0.2)' : 'rgba(76, 175, 80, 0.1)';
+            ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+
+            // Border
+            ctx.strokeStyle = isCrossing ? '#ff9800' : '#4CAF50';
+            ctx.lineWidth = isCrossing ? 3 : 2;
+            ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+
+            // Label
+            ctx.fillStyle = isCrossing ? '#ff9800' : '#4CAF50';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(plot.name, (x1 + x2) / 2, (y1 + y2) / 2);
+        });
+
+        // Draw current location
+        const locX = longToX(location.long);
+        const locY = latToY(location.lat);
+        ctx.fillStyle = '#2196F3';
+        ctx.beginPath();
+        ctx.arc(locX, locY, 10, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.strokeStyle = '#1976d2';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Add label for location
+        ctx.fillStyle = '#1976d2';
+        ctx.font = 'bold 13px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(location.location, locX, locY - 20);
+
+        // Populate sidebar with plots
+        const plotsList = document.getElementById('plotsList');
+        plots.forEach(plot => {
+            const isCrossing = crossingPlots.some(p => p.name === plot.name);
+            const plotDiv = document.createElement('div');
+            plotDiv.className = `plot-item ${isCrossing ? 'crossing' : ''}`;
+            plotDiv.innerHTML = `
+                <div class="plot-name">${plot.name}</div>
+                <div class="plot-coords">
+                    <div>S: ${plot.S.toFixed(6)} | N: ${plot.N.toFixed(6)}</div>
+                    <div>W: ${plot.W.toFixed(6)} | E: ${plot.E.toFixed(6)}</div>
+                </div>
+                ${isCrossing ? '<div class="status">✓ Contains location</div>' : ''}
+            `;
+            plotsList.appendChild(plotDiv);
+        });
+    </script>
+</body>
+</html>
