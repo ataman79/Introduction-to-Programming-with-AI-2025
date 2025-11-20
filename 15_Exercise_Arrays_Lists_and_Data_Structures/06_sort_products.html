@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sort Products</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .input-section {
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .helper-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-sort {
+            background: #667eea;
+            color: white;
+        }
+        .btn-sort:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-clear {
+            background: #f0f0f0;
+            color: #666;
+        }
+        .btn-clear:hover {
+            background: #e0e0e0;
+        }
+        .output-section {
+            margin-top: 30px;
+            min-height: 100px;
+        }
+        .output-label {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        ol {
+            list-style-position: inside;
+            line-height: 2;
+        }
+        li {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            color: #333;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        li:hover {
+            background: linear-gradient(135deg, #667eea25, #764ba225);
+            transform: translateX(5px);
+        }
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 Sort Products</h1>
+        <p class="subtitle">Enter products and sort them alphabetically</p>
+        
+        <div class="input-section">
+            <label for="productInput">Enter Products (comma-separated):</label>
+            <input 
+                type="text" 
+                id="productInput" 
+                placeholder="e.g., Potatoes, Tomatoes, Onions, Apples"
+            >
+            <p class="helper-text">Separate each product with a comma</p>
+            
+            <div class="button-group">
+                <button class="btn-sort" onclick="sortAndDisplay()">Sort Products</button>
+                <button class="btn-clear" onclick="clearAll()">Clear</button>
+            </div>
+        </div>
+
+        <div class="output-section">
+            <div class="output-label">Sorted Products:</div>
+            <div id="output" class="empty-state">Enter products and click "Sort Products" to see results</div>
+        </div>
+    </div>
+
+    <script>
+        function sortProducts(products, formatAsHTML = false) {
+            let sorted = products.sort((a, b) => a.localeCompare(b));
+            
+            if (formatAsHTML) {
+                let result = '<ol>\n';
+                for (let i = 0; i < sorted.length; i++) {
+                    result += `  <li>${sorted[i].trim()}</li>\n`;
+                }
+                result += '</ol>';
+                return result;
+            } else {
+                let result = '';
+                for (let i = 0; i < sorted.length; i++) {
+                    result += `${i + 1}.${sorted[i]}\n`;
+                }
+                return result;
+            }
+        }
+
+        function sortAndDisplay() {
+            const input = document.getElementById('productInput').value;
+            const output = document.getElementById('output');
+
+            if (input.trim() === '') {
+                output.innerHTML = '<div class="empty-state">Please enter at least one product</div>';
+                return;
+            }
+
+            const products = input.split(',').filter(p => p.trim() !== '');
+            
+            if (products.length === 0) {
+                output.innerHTML = '<div class="empty-state">Please enter valid products</div>';
+                return;
+            }
+
+            const htmlOutput = sortProducts(products, true);
+            output.innerHTML = htmlOutput;
+        }
+
+        function clearAll() {
+            document.getElementById('productInput').value = '';
+            document.getElementById('output').innerHTML = '<div class="empty-state">Enter products and click "Sort Products" to see results</div>';
+        }
+
+        // Allow Enter key to sort
+        document.getElementById('productInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sortAndDisplay();
+            }
+        });
+    </script>
+</body>
+</html>

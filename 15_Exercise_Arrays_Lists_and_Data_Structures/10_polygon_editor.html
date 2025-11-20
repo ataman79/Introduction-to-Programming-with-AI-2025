@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Polygon Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #e2e8f0;
+            background-color: #f7fafc;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #718096;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            margin: 0;
+        }
+
+        .tab-button:hover {
+            color: #4a5568;
+            background-color: #edf2f7;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background-color: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            min-height: 600px;
+        }
+
+        .tab-content.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .content {
+            display: contents;
+        }
+
+        @media (max-width: 968px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .map-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .map-section h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        #map {
+            flex: 1;
+            border-radius: 6px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            min-height: 500px;
+            cursor: crosshair;
+        }
+
+        #map2 {
+            flex: 1;
+            border-radius: 6px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            min-height: 500px;
+            cursor: crosshair;
+        }
+
+        .controls-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .controls-section h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background-color: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: #48bb78;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(72, 187, 120, 0.4);
+        }
+
+        .btn-danger {
+            background-color: #f56565;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            background-color: #e53e3e;
+            transform: translateY(-1px);
+        }
+
+        .btn-warning {
+            background-color: #ed8936;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-warning:hover {
+            background-color: #dd6b20;
+            transform: translateY(-1px);
+        }
+
+        .btn-info {
+            background-color: #4299e1;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-info:hover {
+            background-color: #3182ce;
+            transform: translateY(-1px);
+        }
+
+        .table-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            background-color: #fafafa;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background-color: #edf2f7;
+            position: sticky;
+            top: 0;
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 2px solid #cbd5e0;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+
+        tbody tr:hover {
+            background-color: #f0f4f8;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .empty-message {
+            padding: 20px;
+            text-align: center;
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #2d3748;
+        }
+
+        .close {
+            color: #a0aec0;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #2d3748;
+        }
+
+        .json-output {
+            background-color: #f7fafc;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            color: #2d3748;
+        }
+
+        .copy-button {
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .coords-info {
+            background-color: #edf2f7;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #4a5568;
+        }
+
+        .stats {
+            background-color: #f7fafc;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #a0aec0;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗺️ Interactive Polygon Editor</h1>
+            <p>Create polygons by clicking on the map to add points</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('polygon-editor')">🔷 Polygon Editor</button>
+            <button class="tab-button" onclick="switchTab('points-checker')">🔵 Points on Map</button>
+        </div>
+
+        <!-- Polygon Editor Tab -->
+        <div id="polygon-editor" class="tab-content active">
+            <!-- Map Section -->
+            <div class="map-section">
+                <h2>Map</h2>
+                <div id="map"></div>
+                <div class="coords-info" id="coordsInfo">Click on the map to add points</div>
+            </div>
+
+            <!-- Controls Section -->
+            <div class="controls-section">
+                <h2>Points Management</h2>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Points Added</div>
+                        <div class="stat-value" id="pointCount">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Polygon Area</div>
+                        <div class="stat-value" id="areaValue">-</div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" id="viewArrayBtn">📋 View as Array</button>
+                    <button class="btn-secondary" id="clearAllBtn">🗑️ Clear All</button>
+                    <button class="btn-primary" id="downloadBtn">⬇️ Download</button>
+                </div>
+
+                <h3 style="margin-bottom: 10px; font-size: 14px; color: #4a5568;">Points:</h3>
+                <div class="table-wrapper">
+                    <table id="pointsTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Latitude</th>
+                                <th>Longitude</th>
+                                <th style="width: 120px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr>
+                                <td colspan="4" class="empty-message">No points added yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Points Checker Tab -->
+        <div id="points-checker" class="tab-content">
+            <!-- Map Section -->
+            <div class="map-section">
+                <h2>Map with Points</h2>
+                <div id="map2"></div>
+                <div class="coords-info" id="coordsInfo2">Click on the map to add test points</div>
+            </div>
+
+            <!-- Test Points Section -->
+            <div class="controls-section">
+                <h2>Test Points</h2>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Polygon Points</div>
+                        <div class="stat-value" id="polygonPointCount">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Test Points</div>
+                        <div class="stat-value" id="testPointCount">0</div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" id="clearTestPointsBtn">🗑️ Clear Test Points</button>
+                </div>
+
+                <h3 style="margin-bottom: 10px; font-size: 14px; color: #4a5568;">Test Points:</h3>
+                <div class="table-wrapper">
+                    <table id="testPointsTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Latitude</th>
+                                <th>Longitude</th>
+                                <th style="width: 80px;">Status</th>
+                                <th style="width: 80px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="testTableBody">
+                            <tr>
+                                <td colspan="5" class="empty-message">No test points added yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Viewing Array -->
+    <div id="arrayModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Polygon Array</h2>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <div id="arrayDisplay"></div>
+            <button class="btn-primary copy-button" id="copyBtn">📋 Copy to Clipboard</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script>
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show the selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            // Invalidate maps to trigger resize
+            setTimeout(() => {
+                if (map && typeof map.invalidateSize === 'function') {
+                    map.invalidateSize();
+                }
+                if (map2 && typeof map2.invalidateSize === 'function') {
+                    map2.invalidateSize();
+                }
+            }, 100);
+        }
+
+        // Initialize data
+        let points = [];
+        let markers = [];
+        let polygon = null;
+        let map;
+
+        let testPoints = [];
+        let testMarkers = [];
+        let map2;
+
+        // Sofia, Bulgaria coordinates
+        const SOFIA_LAT = 42.6977;
+        const SOFIA_LNG = 23.3219;
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([SOFIA_LAT, SOFIA_LNG], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Add click event to map
+            map.on('click', function(e) {
+                addPoint(e.latlng.lat, e.latlng.lng);
+            });
+
+            // Add a marker for Sofia center
+            L.circleMarker([SOFIA_LAT, SOFIA_LNG], {
+                radius: 5,
+                fillColor: '#667eea',
+                color: '#667eea',
+                weight: 2,
+                opacity: 0.5,
+                fillOpacity: 0.5
+            }).addTo(map).bindPopup('Sofia, Bulgaria');
+        }
+
+        // Initialize second map (Points Checker)
+        function initMap2() {
+            map2 = L.map('map2').setView([SOFIA_LAT, SOFIA_LNG], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            }).addTo(map2);
+
+            // Add click event to map2
+            map2.on('click', function(e) {
+                addTestPoint(e.latlng.lat, e.latlng.lng);
+            });
+
+            // Add a marker for Sofia center
+            L.circleMarker([SOFIA_LAT, SOFIA_LNG], {
+                radius: 5,
+                fillColor: '#667eea',
+                color: '#667eea',
+                weight: 2,
+                opacity: 0.5,
+                fillOpacity: 0.5
+            }).addTo(map2).bindPopup('Sofia, Bulgaria');
+        }
+
+        // Add point to polygon
+        function addPoint(lat, lng) {
+            points.push({ lat: parseFloat(lat.toFixed(6)), lng: parseFloat(lng.toFixed(6)) });
+            
+            // Add marker to map
+            const marker = L.circleMarker([lat, lng], {
+                radius: 6,
+                fillColor: '#48bb78',
+                color: '#2f855a',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(map);
+            
+            marker.bindPopup(`Point ${points.length}<br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`);
+            markers.push(marker);
+
+            updateTable();
+            drawPolygon();
+            updateCoords(lat, lng);
+            updateMap2Polygon();
+        }
+
+        // Add test point
+        function addTestPoint(lat, lng) {
+            if (points.length < 3) {
+                alert('Please create a polygon with at least 3 points first!');
+                return;
+            }
+
+            const testPoint = { lat: parseFloat(lat.toFixed(6)), lng: parseFloat(lng.toFixed(6)) };
+            testPoints.push(testPoint);
+            
+            // Check if point is inside polygon
+            const isInside = pointInPolygon(testPoint, points);
+            
+            // Add marker to map2 with appropriate color
+            const marker = L.circleMarker([lat, lng], {
+                radius: 6,
+                fillColor: isInside ? '#48bb78' : '#f56565',
+                color: isInside ? '#2f855a' : '#e53e3e',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(map2);
+            
+            const statusText = isInside ? 'Inside' : 'Outside';
+            marker.bindPopup(`Test Point ${testPoints.length}<br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}<br>Status: ${statusText}`);
+            testMarkers.push({ marker, isInside });
+
+            updateTestPointsTable();
+            updateCoordsMap2(lat, lng, isInside);
+        }
+
+        // Point in polygon algorithm (Ray casting)
+        function pointInPolygon(point, polygon) {
+            let inside = false;
+            for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                const xi = polygon[i].lng, yi = polygon[i].lat;
+                const xj = polygon[j].lng, yj = polygon[j].lat;
+
+                const intersect = ((yi > point.lat) !== (yj > point.lat))
+                    && (point.lng < (xj - xi) * (point.lat - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+            return inside;
+        }
+
+        // Update polygon visualization
+        function drawPolygon() {
+            if (polygon) {
+                map.removeLayer(polygon);
+            }
+
+            if (points.length >= 2) {
+                const latLngs = points.map(p => [p.lat, p.lng]);
+                if (points.length >= 3) {
+                    latLngs.push([points[0].lat, points[0].lng]); // Close the polygon
+                }
+
+                polygon = L.polyline(latLngs, {
+                    color: '#667eea',
+                    weight: 2,
+                    opacity: 0.7,
+                    dashArray: '5, 5'
+                }).addTo(map);
+            }
+        }
+
+        // Update polygon visualization on map2
+        function updateMap2Polygon() {
+            // Remove old polygons
+            map2.eachLayer(layer => {
+                if (layer instanceof L.Polyline && !(layer instanceof L.CircleMarker)) {
+                    map2.removeLayer(layer);
+                }
+            });
+
+            if (points.length >= 2) {
+                const latLngs = points.map(p => [p.lat, p.lng]);
+                if (points.length >= 3) {
+                    latLngs.push([points[0].lat, points[0].lng]); // Close the polygon
+                }
+
+                const polygonLayer = L.polyline(latLngs, {
+                    color: '#667eea',
+                    weight: 2,
+                    opacity: 0.7,
+                    dashArray: '5, 5'
+                }).addTo(map2);
+            }
+
+            // Redraw all polygon markers
+            map2.eachLayer(layer => {
+                if (layer instanceof L.CircleMarker && layer !== circleMarker) {
+                    if (!layer.isTestMarker) {
+                        map2.removeLayer(layer);
+                    }
+                }
+            });
+
+            points.forEach(point => {
+                const marker = L.circleMarker([point.lat, point.lng], {
+                    radius: 4,
+                    fillColor: '#667eea',
+                    color: '#5568d3',
+                    weight: 2,
+                    opacity: 0.8,
+                    fillOpacity: 0.6
+                }).addTo(map2);
+                marker.isTestMarker = false;
+            });
+        }
+
+        // Update table view
+        function updateTable() {
+            const tbody = document.getElementById('tableBody');
+            
+            if (points.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-message">No points added yet</td></tr>';
+            } else {
+                tbody.innerHTML = points.map((point, index) => `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${point.lat}</td>
+                        <td>${point.lng}</td>
+                        <td>
+                            <div class="actions-cell">
+                                <button class="btn-info" onclick="editPoint(${index})">✏️ Edit</button>
+                                <button class="btn-warning" onclick="moveUp(${index})" ${index === 0 ? 'disabled' : ''}>⬆️ Up</button>
+                                <button class="btn-warning" onclick="moveDown(${index})" ${index === points.length - 1 ? 'disabled' : ''}>⬇️ Down</button>
+                                <button class="btn-danger" onclick="removePoint(${index})">✕ Remove</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Update stats
+            document.getElementById('pointCount').textContent = points.length;
+            document.getElementById('polygonPointCount').textContent = points.length;
+            
+            // Calculate area if polygon is valid
+            if (points.length >= 3) {
+                const area = calculatePolygonArea(points);
+                document.getElementById('areaValue').textContent = (area / 1000000).toFixed(3) + ' km²';
+            } else {
+                document.getElementById('areaValue').textContent = '-';
+            }
+        }
+
+        // Update table view for test points
+        function updateTestPointsTable() {
+            const tbody = document.getElementById('testTableBody');
+            
+            if (testPoints.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-message">No test points added yet</td></tr>';
+            } else {
+                tbody.innerHTML = testPoints.map((point, index) => {
+                    const isInside = testMarkers[index].isInside;
+                    const statusColor = isInside ? '#48bb78' : '#f56565';
+                    const statusText = isInside ? '✓ Inside' : '✗ Outside';
+                    return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${point.lat}</td>
+                        <td>${point.lng}</td>
+                        <td><span style="color: ${statusColor}; font-weight: bold;">${statusText}</span></td>
+                        <td>
+                            <div class="actions-cell">
+                                <button class="btn-danger" onclick="removeTestPoint(${index})">✕ Remove</button>
+                            </div>
+                        </td>
+                    </tr>
+                `}).join('');
+            }
+
+            // Update stats
+            document.getElementById('testPointCount').textContent = testPoints.length;
+        }
+
+        // Calculate polygon area using Shoelace formula
+        function calculatePolygonArea(points) {
+            if (points.length < 3) return 0;
+
+            let area = 0;
+            const R = 6371000; // Earth's radius in meters
+
+            for (let i = 0; i < points.length; i++) {
+                const p1 = points[i];
+                const p2 = points[(i + 1) % points.length];
+
+                const lat1 = p1.lat * Math.PI / 180;
+                const lat2 = p2.lat * Math.PI / 180;
+                const dLng = (p2.lng - p1.lng) * Math.PI / 180;
+
+                area += (dLng * (2 + Math.sin(lat1) + Math.sin(lat2))) / 2;
+            }
+
+            area = Math.abs(area) * R * R;
+            return area;
+        }
+
+        // Remove point
+        function removePoint(index) {
+            if (confirm(`Remove point ${index + 1}?`)) {
+                points.splice(index, 1);
+                map.removeLayer(markers[index]);
+                markers.splice(index, 1);
+                
+                // Update all markers on map
+                markers.forEach(marker => map.removeLayer(marker));
+                markers = [];
+                points.forEach(point => {
+                    const marker = L.circleMarker([point.lat, point.lng], {
+                        radius: 6,
+                        fillColor: '#48bb78',
+                        color: '#2f855a',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).addTo(map);
+                    markers.push(marker);
+                });
+
+                updateTable();
+                drawPolygon();
+                updateMap2Polygon();
+            }
+        }
+
+        // Remove test point
+        function removeTestPoint(index) {
+            testPoints.splice(index, 1);
+            map2.removeLayer(testMarkers[index].marker);
+            testMarkers.splice(index, 1);
+            updateTestPointsTable();
+        }
+
+        // Edit point
+        function editPoint(index) {
+            const newLat = prompt(`Enter new latitude for point ${index + 1}:`, points[index].lat);
+            if (newLat === null) return;
+
+            const newLng = prompt(`Enter new longitude for point ${index + 1}:`, points[index].lng);
+            if (newLng === null) return;
+
+            const lat = parseFloat(newLat);
+            const lng = parseFloat(newLng);
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+                points[index] = { lat: parseFloat(lat.toFixed(6)), lng: parseFloat(lng.toFixed(6)) };
+                
+                // Update marker position
+                map.removeLayer(markers[index]);
+                const marker = L.circleMarker([lat, lng], {
+                    radius: 6,
+                    fillColor: '#48bb78',
+                    color: '#2f855a',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(map);
+                markers[index] = marker;
+
+                updateTable();
+                drawPolygon();
+                updateMap2Polygon();
+            } else {
+                alert('Invalid coordinates!');
+            }
+        }
+
+        // Move point up
+        function moveUp(index) {
+            if (index > 0) {
+                [points[index - 1], points[index]] = [points[index], points[index - 1]];
+                [markers[index - 1], markers[index]] = [markers[index], markers[index - 1]];
+                updateTable();
+                drawPolygon();
+                updateMap2Polygon();
+            }
+        }
+
+        // Move point down
+        function moveDown(index) {
+            if (index < points.length - 1) {
+                [points[index], points[index + 1]] = [points[index + 1], points[index]];
+                [markers[index], markers[index + 1]] = [markers[index + 1], markers[index]];
+                updateTable();
+                drawPolygon();
+                updateMap2Polygon();
+            }
+        }
+
+        // Update coordinates display
+        function updateCoords(lat, lng) {
+            document.getElementById('coordsInfo').textContent = `Last point added: Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+        }
+
+        // Update coordinates display for map 2
+        function updateCoordsMap2(lat, lng, isInside) {
+            const status = isInside ? 'Inside polygon' : 'Outside polygon';
+            document.getElementById('coordsInfo2').textContent = `Last point: Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)} (${status})`;
+        }
+
+        // View as array
+        function viewArray() {
+            const arrayContent = JSON.stringify(points, null, 2);
+            document.getElementById('arrayDisplay').innerHTML = `
+                <div class="json-output">${arrayContent}</div>
+            `;
+            document.getElementById('arrayModal').style.display = 'block';
+        }
+
+        // Copy to clipboard
+        function copyToClipboard() {
+            const arrayContent = JSON.stringify(points, null, 2);
+            navigator.clipboard.writeText(arrayContent).then(() => {
+                alert('Copied to clipboard!');
+            });
+        }
+
+        // Clear all points
+        function clearAll() {
+            if (confirm('Are you sure you want to remove all points?')) {
+                points = [];
+                markers.forEach(marker => map.removeLayer(marker));
+                markers = [];
+                if (polygon) {
+                    map.removeLayer(polygon);
+                    polygon = null;
+                }
+                updateTable();
+                updateMap2Polygon();
+                document.getElementById('coordsInfo').textContent = 'Click on the map to add points';
+            }
+        }
+
+        // Clear all test points
+        function clearTestPoints() {
+            if (confirm('Are you sure you want to remove all test points?')) {
+                testPoints = [];
+                testMarkers.forEach(marker => map2.removeLayer(marker.marker));
+                testMarkers = [];
+                updateTestPointsTable();
+                document.getElementById('coordsInfo2').textContent = 'Click on the map to add test points';
+            }
+        }
+
+        // Download as JSON
+        function downloadJSON() {
+            const data = JSON.stringify(points, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'polygon_' + new Date().getTime() + '.json';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Modal close handlers
+        document.getElementById('closeModal').onclick = function() {
+            document.getElementById('arrayModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('arrayModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Event listeners
+        document.getElementById('viewArrayBtn').addEventListener('click', viewArray);
+        document.getElementById('copyBtn').addEventListener('click', copyToClipboard);
+        document.getElementById('clearAllBtn').addEventListener('click', clearAll);
+        document.getElementById('clearTestPointsBtn').addEventListener('click', clearTestPoints);
+        document.getElementById('downloadBtn').addEventListener('click', downloadJSON);
+
+        // Initialize both maps on page load
+        window.addEventListener('load', function() {
+            initMap();
+            setTimeout(() => {
+                initMap2();
+                if (map2) map2.invalidateSize();
+            }, 300);
+        });
+    </script>
+</body>
+</html>

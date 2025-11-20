@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Maze Editor - Shortest Path Finder</title>
+    <link rel="stylesheet" href="11_shortest_path_in_a_maze.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗺️ Maze Editor - Shortest Path Finder</h1>
+            <p>Create a maze and find the shortest path from start to end</p>
+        </div>
+
+        <div class="content">
+            <!-- Control Panel -->
+            <div class="controls-panel">
+                <h3 style="margin-bottom: 15px; color: #2d3748;">⚙️ Maze Settings</h3>
+
+                <div class="control-group">
+                    <label>Width: <span id="widthValue">10</span></label>
+                    <input type="range" id="widthSlider" min="5" max="20" value="10">
+                    <div class="value-display">Cells: <span id="widthDisplay">10</span></div>
+                </div>
+
+                <div class="control-group">
+                    <label>Height: <span id="heightValue">10</span></label>
+                    <input type="range" id="heightSlider" min="5" max="20" value="10">
+                    <div class="value-display">Cells: <span id="heightDisplay">10</span></div>
+                </div>
+
+                <div class="control-group">
+                    <label>Edit Mode:</label>
+                    <div class="mode-selector">
+                        <button class="mode-btn active" data-mode="wall" onclick="setMode('wall')">🧱 Wall</button>
+                        <button class="mode-btn" data-mode="free" onclick="setMode('free')">⬜ Free</button>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="generateMaze()">🔄 Create Grid</button>
+                <button class="btn-secondary" onclick="clearMaze()">🗑️ Clear Maze</button>
+                <button class="btn-secondary" onclick="findPath()">🔍 Find Path</button>
+                <button class="btn-danger" onclick="resetPath()">↻ Reset Path</button>
+
+                <div class="info-box">
+                    <strong>Instructions:</strong>
+                    <ul style="margin-left: 15px; margin-top: 8px;">
+                        <li>Use sliders to set maze size</li>
+                        <li>Click cells to draw walls or clear</li>
+                        <li>Press "Set Start" to mark start</li>
+                        <li>Press "Set End" to mark end</li>
+                        <li>Click "Find Path" to solve</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Maze Editor -->
+            <div class="maze-container">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn-primary" onclick="setStartMode()" style="flex: 1; max-width: 200px;">📍 Set Start Point</button>
+                    <button class="btn-primary" onclick="setEndMode()" style="flex: 1; max-width: 200px;">🎯 Set End Point</button>
+                </div>
+
+                <div id="message" class="message"></div>
+
+                <div class="maze-grid" id="mazeGrid"></div>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Grid Size</div>
+                        <div class="stat-value" id="gridSizeStat">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Path Length</div>
+                        <div class="stat-value" id="pathLengthStat">-</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Status</div>
+                        <div class="stat-value" id="statusStat">Ready</div>
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <strong>Legend:</strong>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: white; border: 2px solid #cbd5e0;"></div>
+                        <span>Free Cell</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #2d3748;"></div>
+                        <span>Wall</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #48bb78;"></div>
+                        <span>Start Point (S)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #f56565;"></div>
+                        <span>End Point (E)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #bee3f8;"></div>
+                        <span>Path</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="11_shortest_path_in_a_maze.js"></script>
+</body>
+</html>

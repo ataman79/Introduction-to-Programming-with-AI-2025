@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Balancer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { text-align: center; margin-bottom: 30px; color: #333; }
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .column {
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            background: #fafafa;
+        }
+        .column h2 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        .items-list {
+            margin-bottom: 15px;
+            min-height: 100px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+        .item input {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        .item button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .item button:hover { background: #c0392b; }
+        .mid-display {
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #27ae60;
+            padding: 20px;
+            background: white;
+            border-radius: 4px;
+            border: 2px solid #27ae60;
+            margin-bottom: 15px;
+        }
+        .add-btn {
+            width: 100%;
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .add-btn:hover { background: #229954; }
+        .sums {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .sum-box {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .sum-box strong { display: block; color: #555; margin-bottom: 5px; }
+        .sum-box .value { font-size: 20px; font-weight: bold; }
+        .scale-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .scale-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .scale-visualization {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 250px;
+            position: relative;
+            background: linear-gradient(to bottom, #f9f9f9, #e8e8e8);
+            border-radius: 4px;
+            border: 2px solid #bbb;
+        }
+        .fulcrum {
+            position: absolute;
+            bottom: 20px;
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 30px solid #333;
+        }
+        .beam {
+            position: absolute;
+            bottom: 50px;
+            height: 12px;
+            background: #8b6f47;
+            border-radius: 6px;
+            transform-origin: center;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .weight-container {
+            position: absolute;
+            bottom: 65px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+        .weight {
+            background: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            min-width: 60px;
+            text-align: center;
+        }
+        .weight-label {
+            font-size: 11px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .weight-left {
+            background: #3498db;
+        }
+        .weight-right {
+            background: #e67e22;
+        }
+        .status {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+        .status.balanced { color: #27ae60; font-weight: bold; }
+        .status.unbalanced { color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚖️ Array Balancer</h1>
+        
+        <div class="content">
+            <!-- Left Column -->
+            <div class="column">
+                <h2>Left Numbers</h2>
+                <div class="items-list" id="leftList"></div>
+                <button class="add-btn" onclick="addLeft()">+ Add Number</button>
+            </div>
+
+            <!-- Middle Column -->
+            <div class="column">
+                <h2>Mid Number</h2>
+                <div class="mid-display" id="midDisplay">-</div>
+                <button class="add-btn" onclick="setMid()">Set Mid</button>
+            </div>
+
+            <!-- Right Column -->
+            <div class="column">
+                <h2>Right Numbers</h2>
+                <div class="items-list" id="rightList"></div>
+                <button class="add-btn" onclick="addRight()">+ Add Number</button>
+            </div>
+        </div>
+
+        <!-- Sums Display -->
+        <div class="sums">
+            <div class="sum-box">
+                <strong>Left Sum</strong>
+                <div class="value" id="leftSum">0</div>
+            </div>
+            <div class="sum-box">
+                <strong>Mid Value</strong>
+                <div class="value" id="midValue">0</div>
+            </div>
+            <div class="sum-box">
+                <strong>Right Sum</strong>
+                <div class="value" id="rightSum">0</div>
+            </div>
+        </div>
+
+        <!-- Scale Visualization -->
+        <div class="scale-container">
+            <div class="scale-label">Balance Scale Visualization</div>
+            <div class="scale-visualization" id="scaleVisualization">
+                <div class="fulcrum"></div>
+                <div class="beam" id="beam" style="width: 400px; left: 50%; transform: translateX(-50%) rotateZ(0deg);">
+                    <div class="weight-container" id="leftWeightContainer" style="left: -120px;">
+                        <div class="weight weight-left" id="leftWeight">19</div>
+                        <div class="weight-label">Left</div>
+                    </div>
+                    <div class="weight-container" id="rightWeightContainer" style="right: -120px;">
+                        <div class="weight weight-right" id="rightWeight">22</div>
+                        <div class="weight-label">Right</div>
+                    </div>
+                </div>
+            </div>
+            <div class="status" id="status">Add numbers to balance</div>
+        </div>
+    </div>
+
+    <script>
+        let left = [];
+        let right = [];
+        let mid = 0;
+
+        function addLeft() {
+            left.push(0);
+            renderAll();
+        }
+
+        function addRight() {
+            right.push(0);
+            renderAll();
+        }
+
+        function removeLeft(i) {
+            left.splice(i, 1);
+            renderAll();
+        }
+
+        function removeRight(i) {
+            right.splice(i, 1);
+            renderAll();
+        }
+
+        function updateLeft(i, val) {
+            left[i] = parseInt(val) || 0;
+            renderAll();
+        }
+
+        function updateRight(i, val) {
+            right[i] = parseInt(val) || 0;
+            renderAll();
+        }
+
+        function setMid() {
+            const input = prompt('Enter mid number:', mid);
+            if (input !== null) {
+                mid = parseInt(input) || 0;
+                renderAll();
+            }
+        }
+
+        function renderLeftList() {
+            const list = document.getElementById('leftList');
+            list.innerHTML = left.map((val, i) => `
+                <div class="item">
+                    <input type="number" value="${val}" onchange="updateLeft(${i}, this.value)">
+                    <button onclick="removeLeft(${i})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function renderRightList() {
+            const list = document.getElementById('rightList');
+            list.innerHTML = right.map((val, i) => `
+                <div class="item">
+                    <input type="number" value="${val}" onchange="updateRight(${i}, this.value)">
+                    <button onclick="removeRight(${i})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function updateDisplay() {
+            const leftSum = left.reduce((a, b) => a + b, 0);
+            const rightSum = right.reduce((a, b) => a + b, 0);
+            
+            document.getElementById('midDisplay').textContent = mid;
+            document.getElementById('leftSum').textContent = leftSum;
+            document.getElementById('midValue').textContent = mid;
+            document.getElementById('rightSum').textContent = rightSum;
+
+            // Update weight displays
+            document.getElementById('leftWeight').textContent = leftSum;
+            document.getElementById('rightWeight').textContent = rightSum;
+
+            // Calculate beam tilt (max 15 degrees)
+            const total = leftSum + rightSum;
+            let tilt = 0;
+            if (total > 0) {
+                const diff = rightSum - leftSum;
+                tilt = Math.max(-15, Math.min(15, (diff / total) * 20));
+            }
+            document.getElementById('beam').style.transform = `translateX(-50%) rotateZ(${tilt}deg)`;
+
+            const isBalanced = leftSum === rightSum;
+            const status = document.getElementById('status');
+            if (total === 0) {
+                status.textContent = 'Add numbers to balance';
+                status.className = 'status';
+            } else if (isBalanced) {
+                status.textContent = '✓ Perfectly Balanced!';
+                status.className = 'status balanced';
+            } else {
+                const diff = Math.abs(leftSum - rightSum);
+                status.textContent = `Unbalanced (Difference: ${diff})`;
+                status.className = 'status unbalanced';
+            }
+        }
+
+        function renderAll() {
+            renderLeftList();
+            renderRightList();
+            updateDisplay();
+        }
+
+        renderAll();
+    </script>
+</body>
+</html>
