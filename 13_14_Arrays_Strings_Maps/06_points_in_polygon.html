@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trees in Schoolyard - Map Visualization</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        #map {
+            height: 600px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-circle {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+        .inside { background-color: #2ecc71; }
+        .outside { background-color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <h1>Trees in Schoolyard Visualization</h1>
+    <div id="map"></div>
+    <div class="info">
+        <p><strong>Trees inside schoolyard: <span id="count-inside">0</span></strong></p>
+        <p><strong>Trees outside schoolyard: <span id="count-outside">0</span></strong></p>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-circle inside"></div>
+                <span>Inside schoolyard</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-circle outside"></div>
+                <span>Outside schoolyard</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script>
+        let trees = [
+            {lat:42.67079,lng:23.32921}, {lat:42.67075,lng:23.32964},
+            {lat:42.67051,lng:23.33082}, {lat:42.67028,lng:23.32912},
+            {lat:42.67026,lng:23.33059}, {lat:42.67052,lng:23.33062}
+        ];
+        let schoolyard = [
+            {lat:42.67088,lng:23.32930}, {lat:42.67077,lng:23.33072},
+            {lat:42.67045,lng:23.33067}, {lat:42.67045,lng:23.33059},
+            {lat:42.67008,lng:23.33054}, {lat:42.67016,lng:23.32931},
+            {lat:42.67021,lng:23.32931}, {lat:42.67022,lng:23.32908},
+            {lat:42.67063,lng:23.32913}, {lat:42.67062,lng:23.32926}
+        ];
+
+        // Initialize map
+        const map = L.map('map').setView([42.67050, 23.33000], 17);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Draw schoolyard polygon
+        const polygonCoords = schoolyard.map(p => [p.lat, p.lng]);
+        L.polygon(polygonCoords, {
+            color: '#3498db',
+            weight: 3,
+            opacity: 0.7,
+            fillOpacity: 0.2
+        }).addTo(map).bindPopup('Schoolyard');
+
+        // Add tree markers
+        let insideCount = 0, outsideCount = 0;
+        trees.forEach(tree => {
+            const inside = isPointInPolygon(tree, schoolyard);
+            if (inside) insideCount++;
+            else outsideCount++;
+
+            const color = inside ? '#2ecc71' : '#e74c3c';
+            const icon = L.icon({
+                iconUrl: `data:image/svg+xml,${encodeURIComponent(
+                    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${color}"><circle cx="12" cy="12" r="8"/></svg>`
+                )}`,
+                iconSize: [24, 24]
+            });
+
+            L.marker([tree.lat, tree.lng], {icon})
+                .addTo(map)
+                .bindPopup(`Tree<br>Lat: ${tree.lat}<br>Lng: ${tree.lng}<br>${inside ? 'Inside' : 'Outside'}`);
+        });
+
+        document.getElementById('count-inside').textContent = insideCount;
+        document.getElementById('count-outside').textContent = outsideCount;
+
+        function isPointInPolygon(point, polygon) {
+            let intersections = 0;
+            for (let i = 0; i < polygon.length; i++) {
+                const v1 = polygon[i];
+                const v2 = polygon[(i + 1) % polygon.length];
+                if ((v1.lat > point.lat) !== (v2.lat > point.lat) &&
+                    point.lng < (v2.lng - v1.lng) * (point.lat - v1.lat) / (v2.lat - v1.lat) + v1.lng) {
+                    intersections++;
+                }
+            }
+            return intersections % 2 === 1;
+        }
+    </script>
+</body>
+</html>

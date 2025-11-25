@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Book App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        input[type="text"] {
+            flex: 1;
+            min-width: 150px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        input[type="text"]::placeholder {
+            color: #999;
+        }
+        button {
+            padding: 10px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #764ba2;
+        }
+        button.delete {
+            background: #e74c3c;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        button.delete:hover {
+            background: #c0392b;
+        }
+        button.edit {
+            background: #f39c12;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        button.edit:hover {
+            background: #e67e22;
+        }
+        .contacts-list {
+            list-style: none;
+        }
+        .contact-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #667eea;
+        }
+        .contact-info {
+            flex: 1;
+        }
+        .contact-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .contact-phone {
+            color: #666;
+            font-size: 14px;
+        }
+        .contact-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📞 Contact Book</h1>
+        
+        <div class="controls">
+            <input type="text" id="filterInput" placeholder="Filter by name or phone...">
+            <input type="text" id="nameInput" placeholder="Name">
+            <input type="text" id="phoneInput" placeholder="Phone">
+            <button onclick="addContact()">Add</button>
+            <button onclick="sortContacts()">Sort by Name</button>
+        </div>
+
+        <ul class="contacts-list" id="contactsList"></ul>
+    </div>
+
+    <script>
+        let contacts = [
+            { id: 1, name: "John Doe", phone: "123-456-7890" },
+            { id: 2, name: "Jane Smith", phone: "987-654-3210" },
+            { id: 3, name: "Bob Johnson", phone: "555-1234" }
+        ];
+        let nextId = 4;
+        let editingId = null;
+
+        function renderContacts(list = contacts) {
+            const contactsList = document.getElementById("contactsList");
+            contactsList.innerHTML = "";
+
+            if (list.length === 0) {
+                contactsList.innerHTML = '<div class="empty-message">No contacts found</div>';
+                return;
+            }
+
+            list.forEach(contact => {
+                const li = document.createElement("li");
+                li.className = "contact-item";
+                li.innerHTML = `
+                    <div class="contact-info">
+                        <div class="contact-name">${contact.name}</div>
+                        <div class="contact-phone">${contact.phone}</div>
+                    </div>
+                    <div class="contact-actions">
+                        <button class="edit" onclick="editContact(${contact.id})">Edit</button>
+                        <button class="delete" onclick="deleteContact(${contact.id})">Delete</button>
+                    </div>
+                `;
+                contactsList.appendChild(li);
+            });
+        }
+
+        function addContact() {
+            const nameInput = document.getElementById("nameInput");
+            const phoneInput = document.getElementById("phoneInput");
+            const name = nameInput.value.trim();
+            const phone = phoneInput.value.trim();
+
+            if (!name || !phone) {
+                alert("Please enter both name and phone");
+                return;
+            }
+
+            if (editingId) {
+                const contact = contacts.find(c => c.id === editingId);
+                contact.name = name;
+                contact.phone = phone;
+                editingId = null;
+            } else {
+                contacts.push({ id: nextId++, name, phone });
+            }
+
+            nameInput.value = "";
+            phoneInput.value = "";
+            renderContacts();
+        }
+
+        function editContact(id) {
+            const contact = contacts.find(c => c.id === id);
+            if (contact) {
+                document.getElementById("nameInput").value = contact.name;
+                document.getElementById("phoneInput").value = contact.phone;
+                editingId = id;
+                document.getElementById("nameInput").focus();
+            }
+        }
+
+        function deleteContact(id) {
+            if (confirm("Are you sure?")) {
+                contacts = contacts.filter(c => c.id !== id);
+                editingId = null;
+                renderContacts();
+            }
+        }
+
+        function sortContacts() {
+            contacts.sort((a, b) => a.name.localeCompare(b.name));
+            renderContacts();
+        }
+
+        function filterContacts() {
+            const filterText = document.getElementById("filterInput").value.toLowerCase();
+            const filtered = contacts.filter(c =>
+                c.name.toLowerCase().includes(filterText) ||
+                c.phone.includes(filterText)
+            );
+            renderContacts(filtered);
+        }
+
+        document.getElementById("filterInput").addEventListener("input", filterContacts);
+        document.getElementById("nameInput").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") addContact();
+        });
+        document.getElementById("phoneInput").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") addContact();
+        });
+
+        renderContacts();
+    </script>
+</body>
+</html>

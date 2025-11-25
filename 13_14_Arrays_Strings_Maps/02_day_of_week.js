@@ -1,6 +1,6 @@
 function DayOfWeek(day) {
     if  (day < 1 || day > 7) 
-        throw new Error("Invalid day!" + day);
+        throw new Error("Invalid day: " + day);
     
     let days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
     return days[day - 1];

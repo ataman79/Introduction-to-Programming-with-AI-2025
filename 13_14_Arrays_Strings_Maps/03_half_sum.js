@@ -13,9 +13,9 @@ function halfSum(arr) {
         console.log(`left sum (${leftSum}) = right sum (${rightSum}) `);
     } else if (leftSum < rightSum) { 
 
-        console.log(`Left  sum (${leftSum}) < Right sum (${rightSum}) `);
+        console.log(`left sum (${leftSum}) < right sum (${rightSum}) `);
     } else {
-        console.log(`Left  sum (${leftSum}) > Right sum (${rightSum}) `);
+        console.log(`left sum (${leftSum}) > right sum (${rightSum}) `);
     }
 }
 
