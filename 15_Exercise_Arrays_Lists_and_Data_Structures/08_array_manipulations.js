@@ -27,5 +27,5 @@ function processArrayCommands(input) {
                 break;
         }
     }
-    return arr;
+    return arr.join(' ');
 }

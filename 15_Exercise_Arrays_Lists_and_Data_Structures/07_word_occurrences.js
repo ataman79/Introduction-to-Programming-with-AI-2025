@@ -1,4 +1,9 @@
 function countWordOccurrences(text) {
+    // Handle if input is an array - join it into a single string
+    if (Array.isArray(text)) {
+        text = text.join(' ');
+    }
+    
     // Convert to lowercase and replace sentence delimiters and non-letter characters with spaces
     let cleanText = text.toLowerCase().replace(/[.!?,;]/g, ' ');
     
@@ -32,6 +37,6 @@ function countWordOccurrences(text) {
 }
 
 // Test cases
-countWordOccurrences('The,quick,brown fox jumps over the lazy dog. The dog was very lazy!');
+console.log(countWordOccurrences('The,quick,brown fox jumps over the lazy dog. The dog was very lazy!'));
 console.log('\n---\n');
-countWordOccurrences('Hello world! Hello everyone. World peace is important.');
+console.log(countWordOccurrences('Hello world! Hello everyone. World peace is important.'));
