@@ -35,12 +35,13 @@ function drinkPrice(drink, extra1, extra2) {
   }
 
   // Return the final price in required format
-  return price.toFixed(2);
+  return "Final price: " + price.toFixed(2);
 }
 
+
 // Example usage:
-console.log(drinkPrice("coffee", "sugar"));               // "1.40"
-console.log(drinkPrice("coffee", "creamer", "sugar"));    // "1.70"
-console.log(drinkPrice("tea"));                           // "0.60"
-console.log(drinkPrice("tea", "sugar"));                  // "1.00"
-console.log(drinkPrice("water"));                         // "invalid drink!"
+console.log(drinkPrice("coffee", "sugar"));               // "Final price: 1.40"
+console.log(drinkPrice("coffee", "creamer", "sugar"));    // "Final price: 1.70"
+console.log(drinkPrice("tea"));                           // "Final price: 0.60"
+console.log(drinkPrice("tea", "sugar"));                  // "Final price: 1.00"
+console.log(drinkPrice("water"));                         // "Invalid drink!"

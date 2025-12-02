@@ -1,10 +1,15 @@
 function reverseString(str: string): string {
-    let letters: string[] = [];
-    for (let i = str.length - 1; i >= 0; i--) {
+    var letters: string[] = [];
+    for (var i = str.length - 1; i >= 0; i--) {
         letters.push(str[i]);
     }
-    let result: string = letters.join("");
+    var result: string = letters.join("");
     return result;
 }
 
-console.log(reverseString("TypeScript"));
+var testCases: string[] = ["hello", "TypeScript", "OpenAI", "ChatGPT"];
+
+testCases.forEach((input: string) => {
+    var reversed: string = reverseString(input);
+    console.log(`The reversed string of "${input}" is: "${reversed}"`);
+});

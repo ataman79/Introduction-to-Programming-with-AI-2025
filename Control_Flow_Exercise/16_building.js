@@ -10,8 +10,8 @@ function printBuilding(floors, roomsPerFloor) {
                 floor += `A${i}${j}`;
             }
             if (j < roomsPerFloor - 1) {
-                floor += ', ';
-            }       
+                floor += ' ';
+            }
         }
         console.log(floor);
     }
