@@ -1,42 +1,43 @@
-function countWordOccurrences(text) {
-    // Handle if input is an array - join it into a single string
-    if (Array.isArray(text)) {
-        text = text.join(' ');
+function countWords(input) {
+    // Join lines into one text block (input is array of strings)
+    const text = input.join(" ");
+
+    // Convert to lowercase and split by any non-letter characters
+    const words = text
+        .toLowerCase()
+        .split(/[^a-z]+/)
+        .filter(w => w.length > 0);
+
+    // Count occurrences
+    const counts = {};
+
+    for (const word of words) {
+        counts[word] = (counts[word] || 0) + 1;
     }
-    
-    // Convert to lowercase and replace sentence delimiters and non-letter characters with spaces
-    let cleanText = text.toLowerCase().replace(/[.!?,;]/g, ' ');
-    
-    // Split by non-letter characters to get words
-    let words = cleanText.split(/[^a-z]+/).filter(word => word.length > 0);
-    
-    // Count occurrences of each word
-    let wordCount = {};
-    for (let word of words) {
-        wordCount[word] = (wordCount[word] || 0) + 1;
-    }
-    
-    // Convert to array of [word, count] pairs
-    let wordArray = Object.entries(wordCount);
-    
-    // Sort by count (descending), then alphabetically
-    wordArray.sort((a, b) => {
-        if (b[1] !== a[1]) {
-            return b[1] - a[1]; // Sort by count descending
-        }
-        return a[0].localeCompare(b[0]); // Sort alphabetically
-    });
-    
-    // Format and print output
-    let result = '';
-    for (let [word, count] of wordArray) {
-        result += `${word} -> ${count} times\n`;
+
+    // Convert to array and sort
+    const sorted = Object.entries(counts)
+        .sort((a, b) => {
+            const [wordA, countA] = a;
+            const [wordB, countB] = b;
+
+            // First: by count descending
+            if (countB !== countA) return countB - countA;
+
+            // Second: alphabetically
+            return wordA.localeCompare(wordB);
+        });
+
+    // Print output
+    for (const [word, count] of sorted) {
         console.log(`${word} -> ${count} times`);
     }
-    return result;
 }
 
-// Test cases
-console.log(countWordOccurrences('The,quick,brown fox jumps over the lazy dog. The dog was very lazy!'));
-console.log('\n---\n');
-console.log(countWordOccurrences('Hello world! Hello everyone. World peace is important.'));
+// Example usage:
+countWords([
+    "This is a test. This test is only a test.",
+    "In the event of an actual emergency,",
+    "the attention signal you just heard would have been followed by official information."
+]);
+
