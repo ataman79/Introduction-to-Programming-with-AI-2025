@@ -1,0 +1,23 @@
+{
+  "name": "pdf-invitation-app",
+  "version": "1.0.0",
+  "description": "Generate personalized PDF invitations",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "keywords": [
+    "pdf",
+    "invitations",
+    "personalized"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "puppeteer": "^24.32.0",
+    "xlsx": "^0.18.5"
+  },
+  "type": "module"
+}

@@ -1,0 +1,12 @@
+{
+  "name": "18_exchange_rate_app",
+  "version": "1.0.0",
+  "description": "Crypto Exchange Rates App",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "binance-api-node": "^0.13.4"
+  }
+}
