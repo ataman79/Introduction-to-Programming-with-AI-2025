@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blocking Code Demonstration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .demo-section {
+            margin-bottom: 30px;
+        }
+        
+        .demo-title {
+            color: #667eea;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-blocking {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-blocking:hover:not(:disabled) {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+        
+        .btn-non-blocking {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-non-blocking:hover:not(:disabled) {
+            background-color: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .ui-test {
+            background-color: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .ui-test h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .counter-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .status {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .progress-section {
+            display: none;
+        }
+        
+        .progress-section.show {
+            display: block;
+        }
+        
+        .progress-bar-container {
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            height: 30px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .output-box {
+            background-color: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .output-line {
+            margin-bottom: 5px;
+        }
+        
+        .time-info {
+            background-color: #f0f7ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .time-info p {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .time-info strong {
+            color: #667eea;
+        }
+        
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            color: #856404;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Blocking Code Demonstration</h1>
+        <p class="subtitle">Watch how blocking code freezes the UI vs non-blocking alternatives</p>
+        
+        <!-- UI Responsiveness Test -->
+        <div class="demo-section">
+            <div class="demo-title">UI Responsiveness Test</div>
+            <p style="color: #666; margin-bottom: 15px; font-size: 13px;">Try clicking the counter while code is running. Blocking code will freeze the UI!</p>
+            <div class="ui-test">
+                <h3>Click Me (Should Continue Working)</h3>
+                <div class="counter-display" id="counter">0</div>
+                <div class="status">Clicks: <span id="clicks">0</span></div>
+            </div>
+        </div>
+        
+        <!-- Blocking Approach -->
+        <div class="demo-section">
+            <div class="demo-title">❌ Blocking Approach (Freezes UI)</div>
+            <p style="color: #666; margin-bottom: 15px; font-size: 13px;">The entire JavaScript thread is blocked during calculation.</p>
+            <div class="button-group">
+                <button class="btn-blocking" id="blockingBtn" onclick="runBlocking()">Start Blocking Calculation</button>
+            </div>
+            <div class="time-info">
+                <p>Execution Time: <strong id="blockingTime">-</strong></p>
+                <p>Status: <strong id="blockingStatus">Ready</strong></p>
+            </div>
+            <div class="progress-section" id="blockingProgress">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="blockingBar"></div>
+                </div>
+                <p style="text-align: center; color: #666; font-size: 12px;" id="blockingPercent">0%</p>
+            </div>
+            <div class="output-box" id="blockingOutput"></div>
+        </div>
+        
+        <!-- Non-Blocking Approach -->
+        <div class="demo-section">
+            <div class="demo-title">✅ Non-Blocking Approach (Uses Async)</div>
+            <p style="color: #666; margin-bottom: 15px; font-size: 13px;">The calculation is broken into chunks using async/await to keep the UI responsive.</p>
+            <div class="button-group">
+                <button class="btn-non-blocking" id="nonBlockingBtn" onclick="runNonBlocking()">Start Non-Blocking Calculation</button>
+            </div>
+            <div class="time-info">
+                <p>Execution Time: <strong id="nonBlockingTime">-</strong></p>
+                <p>Status: <strong id="nonBlockingStatus">Ready</strong></p>
+            </div>
+            <div class="progress-section" id="nonBlockingProgress">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="nonBlockingBar"></div>
+                </div>
+                <p style="text-align: center; color: #666; font-size: 12px;" id="nonBlockingPercent">0%</p>
+            </div>
+            <div class="output-box" id="nonBlockingOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        let clickCount = 0;
+        
+        // UI click handler
+        document.querySelector('.counter-display').addEventListener('click', function() {
+            clickCount++;
+            document.getElementById('clicks').textContent = clickCount;
+            document.getElementById('counter').textContent = clickCount;
+        });
+
+        // Blocking calculation (from blocking_code.js)
+        function blockingFindSum(limit) {
+            let sum = 0, result = "0";
+            for (let i = 1; i <= limit; i++) {
+                if (i % 1_000_000 === 0) {
+                    const percent = Math.round((i / limit) * 100);
+                    updateBlockingProgress(percent);
+                    logBlocking(`Calculating [${percent}%]`);
+                }
+                sum += i;
+                result += " + " + i;
+            }
+            return result + " = " + sum;
+        }
+
+        // Non-blocking calculation (chunked with async)
+        async function nonBlockingFindSum(limit, chunkSize = 5_000_000) {
+            let sum = 0, result = "0";
+            
+            for (let start = 1; start <= limit; start += chunkSize) {
+                const end = Math.min(start + chunkSize - 1, limit);
+                
+                for (let i = start; i <= end; i++) {
+                    if (i % 1_000_000 === 0) {
+                        const percent = Math.round((i / limit) * 100);
+                        updateNonBlockingProgress(percent);
+                        logNonBlocking(`Calculating [${percent}%]`);
+                    }
+                    sum += i;
+                    result += " + " + i;
+                }
+                
+                // Yield control back to the browser
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+            
+            return result + " = " + sum;
+        }
+
+        function updateBlockingProgress(percent) {
+            document.getElementById('blockingBar').style.width = percent + '%';
+            document.getElementById('blockingPercent').textContent = percent + '%';
+        }
+
+        function updateNonBlockingProgress(percent) {
+            document.getElementById('nonBlockingBar').style.width = percent + '%';
+            document.getElementById('nonBlockingPercent').textContent = percent + '%';
+        }
+
+        function logBlocking(message) {
+            const output = document.getElementById('blockingOutput');
+            output.innerHTML += `<div class="output-line">${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function logNonBlocking(message) {
+            const output = document.getElementById('nonBlockingOutput');
+            output.innerHTML += `<div class="output-line">${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        async function runBlocking() {
+            clickCount = 0;
+            document.getElementById('clicks').textContent = '0';
+            
+            const btn = document.getElementById('blockingBtn');
+            const output = document.getElementById('blockingOutput');
+            const progressSection = document.getElementById('blockingProgress');
+            
+            btn.disabled = true;
+            output.innerHTML = '';
+            progressSection.classList.add('show');
+            document.getElementById('blockingStatus').textContent = 'Running...';
+            
+            logBlocking('Start...');
+            
+            const startTime = performance.now();
+            const result = blockingFindSum(30_000_000);
+            const endTime = performance.now();
+            
+            const executionTime = (endTime - startTime) / 1000;
+            
+            logBlocking(`Done. Result length: ${result.length}`);
+            logBlocking(`Execution time: ${executionTime.toFixed(2)}s`);
+            logBlocking(`Notice: UI was frozen during this calculation!`);
+            logBlocking(`Attempted clicks while running: ${clickCount}`);
+            
+            document.getElementById('blockingTime').textContent = executionTime.toFixed(2) + 's';
+            document.getElementById('blockingStatus').textContent = 'Completed';
+            
+            btn.disabled = false;
+        }
+
+        async function runNonBlocking() {
+            clickCount = 0;
+            document.getElementById('clicks').textContent = '0';
+            
+            const btn = document.getElementById('nonBlockingBtn');
+            const output = document.getElementById('nonBlockingOutput');
+            const progressSection = document.getElementById('nonBlockingProgress');
+            
+            btn.disabled = true;
+            output.innerHTML = '';
+            progressSection.classList.add('show');
+            document.getElementById('nonBlockingStatus').textContent = 'Running...';
+            
+            logNonBlocking('Start...');
+            
+            const startTime = performance.now();
+            const result = await nonBlockingFindSum(30_000_000);
+            const endTime = performance.now();
+            
+            const executionTime = (endTime - startTime) / 1000;
+            
+            logNonBlocking(`Done. Result length: ${result.length}`);
+            logNonBlocking(`Execution time: ${executionTime.toFixed(2)}s`);
+            logNonBlocking(`Notice: UI remained responsive! You could click the counter.`);
+            logNonBlocking(`Successful clicks while running: ${clickCount}`);
+            
+            document.getElementById('nonBlockingTime').textContent = executionTime.toFixed(2) + 's';
+            document.getElementById('nonBlockingStatus').textContent = 'Completed';
+            
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>

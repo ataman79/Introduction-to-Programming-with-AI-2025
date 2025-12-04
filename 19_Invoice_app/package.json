@@ -1,0 +1,23 @@
+{
+  "name": "invoices-app",
+  "version": "1.0.0",
+  "description": "A monorepo for managing invoices with library, console app, and web app",
+  "private": true,
+  "workspaces": [
+    "invoice-repo",
+    "invoice-console-app",
+    "invoice-web-app"
+  ],
+  "scripts": {
+    "install-all": "npm install",
+    "dev": "npm run dev --workspace=invoice-web-app",
+    "console": "npm start --workspace=invoice-console-app",
+    "web": "npm start --workspace=invoice-web-app",
+    "test": "",
+    "build": "npm run build --workspaces",
+    "build:repo": "npm run build --workspace=invoice-repo",
+    "build:console": "npm run build --workspace=invoice-console-app",
+    "build:web": "npm run build --workspace=invoice-web-app",
+    "start": "npm start --workspaces"
+  }
+}

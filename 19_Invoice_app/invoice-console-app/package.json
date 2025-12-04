@@ -1,0 +1,25 @@
+{
+  "name": "invoice-console-app",
+  "version": "1.0.0",
+  "description": "Console application for demonstrating invoice management",
+  "main": "dist/index.js",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "build:watch": "tsc --watch",
+    "dev": "npm run build && npm start"
+  },
+  "keywords": [
+    "invoice",
+    "console"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "invoice-repo": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
